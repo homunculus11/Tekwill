@@ -1,0 +1,81 @@
+@import url("style.css");
+
+body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.site-header {
+  display: flex;
+  height: 74px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  color: var(--color-text-main);
+  background-color: var(--color-bg-card);
+  border: var(--color-border) 1px solid;
+}
+
+.header-logo,
+.header-items,
+.header-btns {
+  display: flex;
+  gap: 15px;
+}
+
+.header-items {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#header-logo {
+  height: 74px;
+}
+
+#header-items {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+}
+
+#login-btn {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+#login-btn:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse);
+}
+
+#signup-btn {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+#signup-btn:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse);
+}
+
+
+.header-item {
+  color: inherit;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: large;
+}

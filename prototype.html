@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RESONANCE — Podcast</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-deep: #0a0a0b;
+    --bg-card: #13131a;
+    --bg-card-hover: #1a1a24;
+    --accent: #e8c96d;
+    --accent-dim: rgba(232,201,109,0.15);
+    --accent-glow: rgba(232,201,109,0.35);
+    --text-primary: #f0efe8;
+    --text-secondary: #7a7a85;
+    --text-muted: #4e4e56;
+    --border: rgba(255,255,255,0.06);
+    --radius: 16px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── NOISE GRAIN OVERLAY ─── */
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:999;
+    pointer-events:none;
+    opacity:.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 48px;
+    backdrop-filter: blur(24px);
+    background: rgba(10,10,11,0.6);
+    border-bottom: 1px solid var(--border);
+    transition: background .3s;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight:900; font-size:1.35rem;
+    letter-spacing:.08em;
+    color: var(--accent);
+  }
+  .nav-links { display:flex; gap:32px; }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration:none;
+    font-size:.82rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    font-weight:400;
+    transition: color .3s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 8px 22px;
+    border-radius: 999px;
+    font-size:.78rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition: background .3s, color .3s, box-shadow .3s;
+    font-family:'Inter',sans-serif;
+  }
+  .nav-cta:hover {
+    background: var(--accent);
+    color: var(--bg-deep);
+    box-shadow: 0 0 24px var(--accent-glow);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center;
+    padding: 120px 24px 80px;
+  }
+
+  /* Ambient orb bg */
+  .hero-orb {
+    position:absolute;
+    border-radius:50%;
+    filter: blur(90px);
+    pointer-events:none;
+  }
+  .orb-1 {
+    width:520px; height:520px;
+    background: radial-gradient(circle, rgba(232,201,109,0.18) 0%, transparent 70%);
+    top: 10%; left: 50%; transform:translateX(-50%);
+    animation: float1 8s ease-in-out infinite;
+  }
+  .orb-2 {
+    width:300px; height:300px;
+    background: radial-gradient(circle, rgba(100,140,200,0.12) 0%, transparent 70%);
+    bottom: 20%; left: 15%;
+    animation: float2 10s ease-in-out infinite;
+  }
+  .orb-3 {
+    width:200px; height:200px;
+    background: radial-gradient(circle, rgba(180,100,200,0.1) 0%, transparent 70%);
+    top: 30%; right: 12%;
+    animation: float3 7s ease-in-out infinite;
+  }
+
+  @keyframes float1 { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-30px)} }
+  @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+  @keyframes float3 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-15px) rotate(5deg)} }
+
+  .hero-eyebrow {
+    position:relative; z-index:1;
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'DM Mono', monospace;
+    font-size:.72rem; color: var(--accent);
+    letter-spacing:.2em; text-transform:uppercase;
+    margin-bottom:28px;
+    opacity:0; animation: fadeUp .8s .2s forwards;
+  }
+  .hero-eyebrow .dot {
+    width:6px; height:6px; border-radius:50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:.4; transform:scale(1.3); }
+  }
+
+  .hero h1 {
+    position:relative; z-index:1;
+    font-family:'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    font-weight:900;
+    line-height:1.02;
+    letter-spacing:-.02em;
+    color: var(--text-primary);
+    opacity:0; animation: fadeUp .9s .35s forwards;
+  }
+  .hero h1 em {
+    font-style:italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    position:relative; z-index:1;
+    max-width:520px;
+    margin: 32px auto 0;
+    font-size:.95rem;
+    color: var(--text-secondary);
+    line-height:1.7;
+    font-weight:300;
+    opacity:0; animation: fadeUp .9s .5s forwards;
+  }
+
+  .hero-actions {
+    position:relative; z-index:1;
+    display:flex; gap:16px; align-items:center;
+    margin-top:48px;
+    opacity:0; animation: fadeUp .9s .65s forwards;
+  }
+  .btn-primary {
+    display:inline-flex; align-items:center; gap:10px;
+    background: var(--accent);
+    color: var(--bg-deep);
+    padding: 14px 32px;
+    border-radius:999px;
+    font-size:.82rem;
+    font-weight:500;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    border:none; cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition: box-shadow .3s, transform .2s;
+    box-shadow: 0 4px 30px var(--accent-glow);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 6px 40px rgba(232,201,109,0.5);
+    transform: translateY(-2px);
+  }
+  .btn-secondary {
+    color: var(--text-secondary);
+    font-size:.82rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    border:none; background:transparent; cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition: color .3s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-secondary:hover { color: var(--text-primary); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    color: var(--text-muted);
+    font-family:'DM Mono',monospace;
+    font-size:.65rem; letter-spacing:.15em; text-transform:uppercase;
+    opacity:0; animation: fadeUp .8s 1.2s forwards;
+  }
+  .scroll-hint .line {
+    width:1px; height:36px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%{opacity:1; transform:scaleY(1)} 100%{opacity:0; transform:scaleY(0); transform-origin:top}
+  }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display:flex; justify-content:center; gap:64px;
+    padding:48px 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat { text-align:center; }
+  .stat-value {
+    font-family:'Playfair Display', serif;
+    font-size:2rem; font-weight:700;
+    color: var(--text-primary);
+  }
+  .stat-label {
+    font-family:'DM Mono', monospace;
+    font-size:.68rem; color: var(--text-muted);
+    letter-spacing:.18em; text-transform:uppercase;
+    margin-top:6px;
+  }
+
+  /* ─── SECTION TITLES ─── */
+  .section-label {
+    font-family:'DM Mono', monospace;
+    font-size:.7rem; color: var(--accent);
+    letter-spacing:.22em; text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  .section-title {
+    font-family:'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight:700;
+    line-height:1.2;
+    color: var(--text-primary);
+  }
+
+  /* ─── EPISODES ─── */
+  .episodes { padding: 100px 48px; max-width:1100px; margin:0 auto; }
+  .episodes-header {
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:56px;
+  }
+  .see-all {
+    font-family:'DM Mono',monospace;
+    font-size:.7rem; color: var(--accent);
+    letter-spacing:.12em; text-transform:uppercase;
+    text-decoration:none;
+    transition: opacity .3s;
+  }
+  .see-all:hover { opacity:.6; }
+
+  .episode-list { display:flex; flex-direction:column; gap:2px; }
+
+  .episode-card {
+    display:grid;
+    grid-template-columns: 72px 1fr auto;
+    align-items:center; gap:24px;
+    padding:24px 28px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    text-decoration:none;
+    transition: background .25s, border-color .25s, transform .2s;
+    cursor:pointer;
+  }
+  .episode-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-dim);
+    transform: translateX(6px);
+  }
+
+  .ep-num {
+    font-family:'DM Mono', monospace;
+    font-size:.72rem; color: var(--text-muted);
+    text-align:right;
+  }
+  .ep-info { min-width:0; }
+  .ep-title {
+    font-family:'Playfair Display', serif;
+    font-size:1.1rem; font-weight:600;
+    color: var(--text-primary);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    margin-bottom:6px;
+  }
+  .ep-meta {
+    font-family:'DM Mono', monospace;
+    font-size:.66rem; color: var(--text-muted);
+    letter-spacing:.08em;
+  }
+  .ep-meta span { margin-right:16px; }
+
+  .ep-play {
+    width:44px; height:44px; border-radius:50%;
+    background: var(--accent-dim);
+    border: 1px solid rgba(232,201,109,0.2);
+    display:flex; align-items:center; justify-content:center;
+    transition: background .3s, box-shadow .3s;
+    flex-shrink:0;
+  }
+  .episode-card:hover .ep-play {
+    background: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .ep-play svg { width:14px; height:14px; fill:var(--accent); transition: fill .3s; }
+  .episode-card:hover .ep-play svg { fill: var(--bg-deep); }
+
+  /* ─── FEATURED / ABOUT ─── */
+  .about { padding: 100px 48px; max-width:1100px; margin:0 auto; }
+  .about-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:80px;
+    align-items:center;
+  }
+  .about-visual {
+    position:relative;
+    aspect-ratio:1;
+    border-radius:24px;
+    overflow:hidden;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f1a 100%);
+    border: 1px solid var(--border);
+  }
+  .about-visual .wave-svg {
+    position:absolute; inset:0; width:100%; height:100%;
+  }
+  .about-visual .center-play {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .center-play-btn {
+    width:80px; height:80px; border-radius:50%;
+    background: var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 0 40px var(--accent-glow);
+    cursor:pointer;
+    transition: transform .25s, box-shadow .3s;
+  }
+  .center-play-btn:hover {
+    transform:scale(1.08);
+    box-shadow: 0 0 60px rgba(232,201,109,0.5);
+  }
+  .center-play-btn svg { width:28px; height:28px; fill:var(--bg-deep); margin-left:4px; }
+
+  .about-content .section-label { margin-bottom:16px; }
+  .about-content .section-title { margin-bottom:24px; }
+  .about-content p {
+    color: var(--text-secondary);
+    font-size:.9rem; line-height:1.8; font-weight:300;
+    margin-bottom:20px;
+  }
+  .about-tags {
+    display:flex; flex-wrap:wrap; gap:10px;
+    margin-top:32px;
+  }
+  .tag {
+    background: var(--accent-dim);
+    border: 1px solid rgba(232,201,109,0.15);
+    color: var(--accent);
+    padding: 7px 16px;
+    border-radius:999px;
+    font-family:'DM Mono', monospace;
+    font-size:.66rem; letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+
+  /* ─── SUBSCRIBE ─── */
+  .subscribe {
+    padding: 120px 48px;
+    text-align:center;
+    position:relative;
+  }
+  .subscribe::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at center, rgba(232,201,109,0.06) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .subscribe > * { position:relative; z-index:1; }
+  .subscribe .section-title { margin-bottom:16px; }
+  .subscribe p {
+    color: var(--text-secondary);
+    font-size:.9rem; max-width:440px; margin:0 auto 40px;
+    line-height:1.7; font-weight:300;
+  }
+  .email-form {
+    display:flex; gap:0; max-width:460px; margin:0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius:999px;
+    overflow:hidden;
+    padding: 6px 6px 6px 28px;
+    transition: border-color .3s;
+  }
+  .email-form:focus-within { border-color: rgba(232,201,109,0.35); }
+  .email-form input {
+    flex:1; background:transparent; border:none; outline:none;
+    color: var(--text-primary);
+    font-size:.82rem; font-family:'Inter',sans-serif;
+  }
+  .email-form input::placeholder { color: var(--text-muted); }
+  .email-form button {
+    background: var(--accent); border:none;
+    color: var(--bg-deep);
+    padding: 12px 28px;
+    border-radius:999px;
+    font-size:.75rem; font-weight:500;
+    letter-spacing:.1em; text-transform:uppercase;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition: box-shadow .3s;
+    white-space:nowrap;
+  }
+  .email-form button:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+  .platforms {
+    display:flex; justify-content:center; gap:24px;
+    margin-top:40px; flex-wrap:wrap;
+  }
+  .platform-link {
+    display:inline-flex; align-items:center; gap:8px;
+    color: var(--text-muted);
+    font-family:'DM Mono',monospace;
+    font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
+    text-decoration:none;
+    transition: color .3s;
+  }
+  .platform-link:hover { color: var(--accent); }
+  .platform-link svg { width:16px; height:16px; fill:currentColor; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .footer-logo {
+    font-family:'Playfair Display',serif;
+    font-weight:900; font-size:1.1rem;
+    color: var(--accent); letter-spacing:.08em;
+  }
+  .footer-copy {
+    font-family:'DM Mono',monospace;
+    font-size:.65rem; color: var(--text-muted);
+    letter-spacing:.1em;
+  }
+  .footer-links { display:flex; gap:28px; }
+  .footer-links a {
+    color: var(--text-muted);
+    font-size:.7rem; text-decoration:none;
+    font-family:'DM Mono',monospace;
+    letter-spacing:.1em; text-transform:uppercase;
+    transition: color .3s;
+  }
+  .footer-links a:hover { color: var(--text-primary); }
+
+  /* ─── WAVEFORM ANIMATION (decorative) ─── */
+  .waveform-bars {
+    display:flex; align-items:flex-end; gap:3px;
+    height:48px;
+  }
+  .waveform-bars .bar {
+    width:3px; background: var(--accent);
+    border-radius:2px;
+    animation: barBounce 1.2s ease-in-out infinite;
+  }
+  .waveform-bars .bar:nth-child(1){height:60%;animation-delay:0s}
+  .waveform-bars .bar:nth-child(2){height:80%;animation-delay:.1s}
+  .waveform-bars .bar:nth-child(3){height:45%;animation-delay:.2s}
+  .waveform-bars .bar:nth-child(4){height:90%;animation-delay:.15s}
+  .waveform-bars .bar:nth-child(5){height:55%;animation-delay:.3s}
+  .waveform-bars .bar:nth-child(6){height:75%;animation-delay:.25s}
+  .waveform-bars .bar:nth-child(7){height:40%;animation-delay:.35s}
+  .waveform-bars .bar:nth-child(8){height:85%;animation-delay:.2s}
+
+  @keyframes barBounce {
+    0%,100%{transform:scaleY(1)} 50%{transform:scaleY(.35)}
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:768px){
+    nav { padding:16px 24px; }
+    .nav-links { display:none; }
+    .episodes { padding:60px 20px; }
+    .episodes-header { flex-direction:column; align-items:flex-start; gap:12px; }
+    .episode-card { grid-template-columns:48px 1fr 40px; gap:12px; padding:16px; }
+    .about { padding:60px 20px; }
+    .about-grid { grid-template-columns:1fr; gap:40px; }
+    .stats-bar { gap:24px; flex-wrap:wrap; justify-content:center; }
+    footer { flex-direction:column; gap:20px; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">RESONANCE</div>
+  <div class="nav-links">
+    <a href="#">Episodes</a>
+    <a href="#">About</a>
+    <a href="#">Guests</a>
+    <a href="#">Subscribe</a>
+  </div>
+  <button class="nav-cta">Listen Now</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-orb orb-3"></div>
+
+  <div class="hero-eyebrow"><span class="dot"></span> New Episode Every Tuesday</div>
+  <h1>Stories that<br><em>resonate</em></h1>
+  <p class="hero-sub">Deep conversations with the minds shaping culture, technology, and the human experience. Recorded live in intimate settings.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn-primary">
+      <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M0 0L14 8L0 16V0Z" fill="currentColor"/></svg>
+      Play Latest
+    </a>
+    <a href="#" class="btn-secondary">Browse Episodes →</a>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="line"></div></div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-value">247</div><div class="stat-label">Episodes</div></div>
+  <div class="stat"><div class="stat-value">2.4M</div><div class="stat-label">Monthly Listeners</div></div>
+  <div class="stat"><div class="stat-value">180+</div><div class="stat-label">Guests</div></div>
+  <div class="stat"><div class="stat-value">4.9★</div><div class="stat-label">Rating</div></div>
+</div>
+
+<!-- EPISODES -->
+<section class="episodes">
+  <div class="episodes-header">
+    <div>
+      <div class="section-label">Latest</div>
+      <h2 class="section-title">Recent Episodes</h2>
+    </div>
+    <a href="#" class="see-all">See All →</a>
+  </div>
+  <div class="episode-list">
+    <a class="episode-card" href="#">
+      <div class="ep-num">#247</div>
+      <div class="ep-info">
+        <div class="ep-title">The Quiet Revolution in Synthetic Biology</div>
+        <div class="ep-meta"><span>Jan 28, 2026</span><span>58 min</span></div>
+      </div>
+      <div class="ep-play"><svg viewBox="0 0 14 16"><path d="M0 0L14 8L0 16V0Z"/></svg></div>
+    </a>
+    <a class="episode-card" href="#">
+      <div class="ep-num">#246</div>
+      <div class="ep-info">
+        <div class="ep-title">When Algorithms Dream: AI & Consciousness</div>
+        <div class="ep-meta"><span>Jan 21, 2026</span><span>1h 12 min</span></div>
+      </div>
+      <div class="ep-play"><svg viewBox="0 0 14 16"><path d="M0 0L14 8L0 16V0Z"/></svg></div>
+    </a>
+    <a class="episode-card" href="#">
+      <div class="ep-num">#245</div>
+      <div class="ep-info">
+        <div class="ep-title">Rebuilding Cities from the Ground Up</div>
+        <div class="ep-meta"><span>Jan 14, 2026</span><span>44 min</span></div>
+      </div>
+      <div class="ep-play"><svg viewBox="0 0 14 16"><path d="M0 0L14 8L0 16V0Z"/></svg></div>
+    </a>
+    <a class="episode-card" href="#">
+      <div class="ep-num">#244</div>
+      <div class="ep-info">
+        <div class="ep-title">The Economics of Attention</div>
+        <div class="ep-meta"><span>Jan 7, 2026</span><span>51 min</span></div>
+      </div>
+      <div class="ep-play"><svg viewBox="0 0 14 16"><path d="M0 0L14 8L0 16V0Z"/></svg></div>
+    </a>
+  </div>
+</section>
+
+<!-- ABOUT / FEATURED -->
+<section class="about">
+  <div class="about-grid">
+    <div class="about-visual">
+      <!-- Abstract waveform SVG -->
+      <svg class="wave-svg" viewBox="0 0 400 400" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e8c96d" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#e8c96d" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="wg2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#648cc8" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#648cc8" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,200 C40,160 80,240 120,200 S200,160 240,200 S320,240 400,200 L400,400 L0,400 Z" fill="url(#wg1)" opacity="0.6"/>
+        <path d="M0,250 C60,210 100,280 160,250 S260,210 320,250 S380,270 400,250 L400,400 L0,400 Z" fill="url(#wg2)" opacity="0.5"/>
+        <path d="M0,300 C80,270 140,330 200,300 S300,270 400,300 L400,400 L0,400 Z" fill="url(#wg1)" opacity="0.3"/>
+        <!-- Dots grid accent -->
+        <g opacity="0.15">
+          <circle cx="60" cy="80" r="2" fill="#e8c96d"/><circle cx="90" cy="80" r="2" fill="#e8c96d"/>
+          <circle cx="120" cy="80" r="2" fill="#e8c96d"/><circle cx="60" cy="110" r="2" fill="#e8c96d"/>
+          <circle cx="90" cy="110" r="2" fill="#e8c96d"/><circle cx="120" cy="110" r="2" fill="#e8c96d"/>
+          <circle cx="60" cy="140" r="2" fill="#e8c96d"/><circle cx="90" cy="140" r="2" fill="#e8c96d"/>
+          <circle cx="120" cy="140" r="2" fill="#e8c96d"/>
+        </g>
+      </svg>
+      <div class="center-play">
+        <div class="center-play-btn">
+          <svg viewBox="0 0 28 32"><path d="M0 0L28 16L0 32V0Z"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="about-content">
+      <div class="section-label">About the Show</div>
+      <h2 class="section-title">Conversations<br>worth your time</h2>
+      <p>Resonance is a weekly podcast exploring the intersections of science, culture, and innovation. Each episode features an unscripted, long-form dialogue with people who are quietly reshaping the world.</p>
+      <p>Hosted by <strong style="color:var(--text-primary)">Elena Vargas</strong>, a former investigative journalist turned storyteller, the show has been featured in <em style="color:var(--text-secondary)">The New York Times</em>, <em style="color:var(--text-secondary)">Wired</em>, and more.</p>
+      <div class="about-tags">
+        <span class="tag">Technology</span>
+        <span class="tag">Culture</span>
+        <span class="tag">Science</span>
+        <span class="tag">Innovation</span>
+        <span class="tag">Society</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUBSCRIBE -->
+<section class="subscribe">
+  <div class="section-label">Stay in the loop</div>
+  <h2 class="section-title">Never miss an episode</h2>
+  <p>Get new episodes delivered to your inbox every Tuesday morning, plus exclusive behind-the-scenes content.</p>
+  <div class="email-form">
+    <input type="email" placeholder="your@email.com" />
+    <button>Subscribe</button>
+  </div>
+  <div class="platforms">
+    <a href="#" class="platform-link">
+      <svg viewBox="0 0 24 24"><path d="M12 1C5.4 1 0 6.4 0 13c0 4.7 2.7 8.7 6.7 10.6-.1-.9-.1-2.2.1-3.2.1-.6.8-3.4.8-3.4s-.2-.4-.2-1c0-1 .6-1.7 1.3-1.7.6 0 .9.5.9 1 0 .6-.4 1.6-.6 2.5-.2.7.3 1.3 1 1.3 1.2 0 2.2-1.3 2.2-3.1 0-1.6-1.2-2.7-2.9-2.7-2 0-3.1 1.5-3.1 3 0 .6.2 1.2.5 1.6.1.1.1.1 0 .2-.1.3-.2.7-.2.8 0 .2-.1.2-.3.1-1-.5-1.6-2-1.6-3.2 0-2.6 1.9-5 5.4-5 2.8 0 5 2 5 4.7 0 2.8-1.8 5.1-4.3 5.1-.8 0-1.6-.4-1.9-.9l-.5 1.9c-.2.7-.6 1.5-1 2 .8.2 1.6.3 2.5.3 6.6 0 12-5.4 12-12S18.6 1 12 1z"/></svg>
+      Pinterest
+    </a>
+    <a href="#" class="platform-link">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 8.2c.2 2.1-.6 3.6-2.2 4.7-1.6 1.1-3.8 1.6-6.7 1.5.5.6 1 1.1 1.4 1.6 1.7 2.1 3 3.4 3.9 4 .6.4 1.2.6 1.8.6.3 0 .5.1.7.2.2.1.3.3.3.5 0 .3-.2.6-.7.8-2.3 1-4.7 1.4-7 1.2-2.3-.2-4.3-1-6-2.4-1.7-1.4-2.9-3-3.5-5-.6-1.9-.5-3.9.3-5.8.8-1.9 2.2-3.3 4-4.3 1.8-1 3.8-1.3 5.8-.9 2 .4 3.6 1.3 4.8 2.8.5.6.8 1.3 1 2 .2.7.2 1.5.1 2.2z"/></svg>
+      Spotify
+    </a>
+    <a href="#" class="platform-link">
+      <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      Apple
+    </a>
+    <a href="#" class="platform-link">
+      <svg viewBox="0 0 24 24"><path d="M23.982 4.237a10 10 0 01-2.357-3.598l-.581 1.8c-.493 1.524-1.445 2.827-2.668 3.724A11.566 11.566 0 000 9.849v.497a10.44 10.44 0 009.833 10.385.844.844 0 00.817-.658l.442-1.954a.843.843 0 00-.467-.95 8.596 8.596 0 01-4.293-7.398v-.15a8.5 8.5 0 0114.614-5.891l1.75-1.75A10.495 10.495 0 0023.982 4.237z"/></svg>
+      YouTube
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">RESONANCE</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Resonance Podcast. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
