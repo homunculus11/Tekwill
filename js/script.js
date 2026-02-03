@@ -9,23 +9,30 @@ document.querySelectorAll('[data-scroll]').forEach((btn) => {
 	});
 });
 
-const form = document.querySelector('.newsletter-form');
-if (form) {
-	form.addEventListener('submit', (e) => {
-		e.preventDefault();
-		const input = form.querySelector('input[type="email"]');
-		const email = input?.value.trim();
-		if (!email) return;
-		form.reset();
-		const button = form.querySelector('button');
-		if (button) {
-			const original = button.textContent;
-			button.textContent = 'You are in!';
-			button.disabled = true;
-			setTimeout(() => {
-				button.textContent = original;
-				button.disabled = false;
-			}, 2200);
+// Mobile nav toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const headerDrawer = document.getElementById('header-drawer');
+const headerOverlay = document.querySelector('.header-overlay');
+
+const closeMenu = () => {
+	document.body.classList.remove('nav-open');
+	if (menuToggle) {
+		menuToggle.setAttribute('aria-expanded', 'false');
+	}
+};
+
+if (menuToggle && headerDrawer) {
+	menuToggle.addEventListener('click', () => {
+		const isOpen = document.body.classList.toggle('nav-open');
+		menuToggle.setAttribute('aria-expanded', String(isOpen));
+	});
+
+	headerOverlay?.addEventListener('click', closeMenu);
+	headerDrawer.querySelectorAll('a, button').forEach((el) => el.addEventListener('click', closeMenu));
+
+	window.addEventListener('resize', () => {
+		if (window.innerWidth > 900) {
+			closeMenu();
 		}
 	});
 }
