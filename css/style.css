@@ -1,8 +1,8 @@
 :root {
   /* ===== Brand ===== */
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-soft: #E5E9FF;
+  --color-primary: #008c9c;
+  --color-primary-hover: #0b7a89;
+  --color-primary-soft: #e3f3f5;
 
   /* ===== Backgrounds ===== */
   --color-bg-main: #F8FAFC;
@@ -38,9 +38,9 @@
 
 [data-theme="dark"] {
   /* ===== Brand ===== */
-  --color-primary: #60A5FA;
-  --color-primary-hover: #3B82F6;
-  --color-primary-soft: #0B1220;
+  --color-primary: #58c7d6;
+  --color-primary-hover: #3eb4c3;
+  --color-primary-soft: #0e2026;
 
   /* ===== Backgrounds ===== */
   --color-bg-main: #0B1220;
