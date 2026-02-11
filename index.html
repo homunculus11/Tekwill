@@ -7,7 +7,7 @@
     <title>Educheia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
 </head>
 
@@ -38,7 +38,7 @@
                 <li>
                     <a href="/episodes" class="header-item">Toate Episoadele</a>
                 </li>
-
+                
                 <li>
                     <a href="/about" class="header-item">Despre</a>
                 </li>
@@ -60,7 +60,84 @@
 
     <main>
         <section class="hero">
-          
+            <div class="hero-inner">
+                <div class="hero-copy">
+                    <h1 class="hero-title">Educheia cu<br> <span class="hero-highlight">Elena Vorotneac</span></h1>
+                    <p class="hero-description">Un podcast curajos despre educație, oameni și viitor: conversații care aprind idei, povești care schimbă direcții și invitați care lasă urme.</p>
+
+                    <div class="quote-carousel" aria-label="Citate din episoade">
+                        <figure class="quote-slide">
+                            <blockquote>„Educheia m-a făcut să-mi schimb cursul profesional în 6 luni.”</blockquote>
+                            <figcaption>— Ana, profesor de biologie</figcaption>
+                        </figure>
+                        <figure class="quote-slide">
+                            <blockquote>„În fiecare episod găsesc o întrebare pe care nu îndrăzneam s-o pun.”</blockquote>
+                            <figcaption>— Vlad, student</figcaption>
+                        </figure>
+                        <figure class="quote-slide">
+                            <blockquote>„Un spațiu rar în care educația e tratată cu curaj și empatie.”</blockquote>
+                            <figcaption>— Maria, mentor</figcaption>
+                        </figure>
+                    </div>
+
+                    <div class="hero-ctas">
+                        <button class="btn btn-primary" type="button" onclick="window.location.href='/episodes#latest'">Ascultă ultimul episod</button>
+                        <button class="btn btn-ghost" type="button" onclick="window.location.href='/themes'">Vezi temele fierbinți</button>
+                    </div>
+
+                    <div class="hero-tags" aria-label="Categorii și valori">
+                        <span class="pill">Educație pe bune</span>
+                        <span class="pill">Despre Educație</span>
+                        <span class="pill">Pentru Educație</span>
+                    </div>
+
+                    <div class="hero-metrics" aria-label="Statistici podcast">
+                        <div class="metric-card">
+                            <p class="metric-label">Episoade</p>
+                            <p class="metric-value">58</p>
+                            <p class="metric-caption">interviuri care inspiră</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Invitați</p>
+                            <p class="metric-value">42</p>
+                            <p class="metric-caption">lideri & mentori</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Comunitate</p>
+                            <p class="metric-value">12K</p>
+                            <p class="metric-caption">ascultători activi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="hero-photo">
+                        <div class="photo-glow"></div>
+                        <img src="images/hero.png" alt="Elena Vorotneac" class="hero-image">
+                        <div class="photo-ring"></div>
+                    </div>
+
+                    <div class="floating-card">
+                        <div class="floating-top">
+                            <span class="pill pill-soft">Episod nou</span>
+                            <span class="floating-time">35:14</span>
+                        </div>
+                        <p class="floating-title">„Școala care învață să greșești inteligent”</p>
+                        <div class="floating-wave">
+                            <span></span><span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="floating-actions">
+                            <button class="btn btn-mini">Play 30s</button>
+                            <span class="floating-note">Preview exclusiv</span>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge">
+                        <span class="badge-dot"></span>
+                        Top 1 Edu podcast în MD · +1.2K ascultări săptămânale
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="episodes" class="section">
