@@ -45,15 +45,7 @@ jobs:
           done
 
           mkdir -p dist/css
-          if [ -f css/index.css ]; then
-            cp css/index.css dist/css/index.css
-          elif [ -f css/tailwind.css ]; then
-            echo "css/index.css missing; using css/tailwind.css as fallback"
-            cp css/tailwind.css dist/css/index.css
-          else
-            echo "No stylesheet found in css/"
-            exit 1
-          fi
+          find css -maxdepth 1 -name '*.css' ! -name '*.tailwind.css' -exec cp {} dist/css/ \;
 
           echo "Dist artifact contents:"
           find dist -maxdepth 3 -type f | sort
