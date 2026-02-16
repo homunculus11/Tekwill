@@ -36,13 +36,27 @@ jobs:
       - name: Prepare Pages artifact
         run: |
           mkdir -p dist
-          for item in assets css images js src index.html prototype.html; do
+          for item in assets images js src index.html prototype.html; do
             if [ -e "$item" ]; then
               cp -r "$item" dist/
             else
               echo "Skipping missing path: $item"
             fi
           done
+
+          mkdir -p dist/css
+          if [ -f css/index.css ]; then
+            cp css/index.css dist/css/index.css
+          elif [ -f css/tailwind.css ]; then
+            echo "css/index.css missing; using css/tailwind.css as fallback"
+            cp css/tailwind.css dist/css/index.css
+          else
+            echo "No stylesheet found in css/"
+            exit 1
+          fi
+
+          echo "Dist artifact contents:"
+          find dist -maxdepth 3 -type f | sort
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
