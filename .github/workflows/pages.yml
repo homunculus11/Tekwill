@@ -36,7 +36,13 @@ jobs:
       - name: Prepare Pages artifact
         run: |
           mkdir -p dist
-          cp -r assets css images js src index.html prototype.html dist/
+          for item in assets css images js src index.html prototype.html; do
+            if [ -e "$item" ]; then
+              cp -r "$item" dist/
+            else
+              echo "Skipping missing path: $item"
+            fi
+          done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
