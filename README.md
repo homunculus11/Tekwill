@@ -15,7 +15,7 @@ npm install
 
 ## Development workflow
 
-1. Start Tailwind in watch mode:
+1. Start Tailwind watch mode:
 
 ```bash
 npm run watch:css
@@ -33,10 +33,12 @@ You can open files directly, but using a local static server (for example VS Cod
 npm run build:css
 ```
 
-This compiles and minifies:
+This discovers all `*.tailwind.css` files in the workspace and compiles each one to a matching `.css` file (same path, same filename without `.tailwind`).
 
-- Input: `css/tailwind.css`
-- Output: `css/index.css`
+Examples:
+
+- `css/index.tailwind.css` → `css/index.css`
+- `css/prototype.tailwind.css` → `css/prototype.css`
 
 ## Deploy to GitHub Pages (auto build + publish)
 
@@ -70,11 +72,12 @@ Use repository-safe relative/hash links in HTML (already applied in `index.html`
 - `prototype.html` – extra/prototype page
 - `src/login.html` – login page
 - `js/script.js` – frontend behavior and data fetch logic
-- `css/tailwind.css` – Tailwind source styles
-- `css/index.css` – generated CSS (do not edit manually)
+- `*.tailwind.css` – Tailwind source styles (auto-discovered)
+- `css/index.css` – generated CSS used by `index.html` and `src/login.html` (do not edit manually)
+- `css/prototype.css` – generated CSS used by `prototype.html` (do not edit manually)
 - `tailwind.config.js` – Tailwind config and content scan paths
 
 ## Notes
 
-- If styles do not update, confirm `npm run watch:css` is running.
+- `npm run watch:css` automatically picks up new `*.tailwind.css` files and starts watching them.
 - The project uses Tailwind utility classes plus custom theme tokens from the config.

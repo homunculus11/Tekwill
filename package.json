@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "npm run build:css",
-    "build:css": "tailwindcss -i ./css/tailwind.css -o ./css/index.css --minify",
-    "watch:css": "tailwindcss -i ./css/tailwind.css -o ./css/index.css --watch"
+    "build:css": "node ./scripts/tailwind-auto.cjs build",
+    "watch:css": "node ./scripts/tailwind-auto.cjs watch"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17"
