@@ -72,6 +72,7 @@ Use repository-safe relative/hash links in HTML (already applied in `index.html`
 - `prototype.html` – extra/prototype page
 - `src/login.html` – login page
 - `js/script.js` – frontend behavior and data fetch logic
+- `css/styles.css` – shared design tokens (colors and related CSS variables)
 - `*.tailwind.css` – Tailwind source styles (auto-discovered)
 - `css/index.css` – generated CSS used by `index.html` and `src/login.html` (do not edit manually)
 - `css/prototype.css` – generated CSS used by `prototype.html` (do not edit manually)
