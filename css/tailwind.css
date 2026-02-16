@@ -136,7 +136,7 @@
   }
 
   #login-btn {
-    @apply cursor-pointer rounded-xl border-[1.5px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
+    @apply cursor-pointer rounded-xl border-[2px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
   }
 
   #login-btn:hover {
