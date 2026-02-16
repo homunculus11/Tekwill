@@ -72,13 +72,42 @@ const readSessionJson = (key, fallback) => {
 	}
 };
 
+const assignEpisodeIds = (items) => {
+	if (!Array.isArray(items)) return [];
+
+	let nextEpisodeId = 1;
+
+	return items.map((item) => {
+		const title = item?.snippet?.title;
+		const isValidEpisode = typeof title === 'string' && title.trim() && !/trailer/i.test(title);
+
+		if (!isValidEpisode) {
+			return {
+				...item,
+				episodeId: null
+			};
+		}
+
+		const episodeWithId = {
+			...item,
+			episodeId: nextEpisodeId
+		};
+
+		nextEpisodeId += 1;
+		return episodeWithId;
+	});
+};
+
 const getEpisodes = async () => {
 	const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 	const cachedTimestamp = readSessionNumber('episodesFetchedAt');
 
 	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
+		const cachedItems = assignEpisodeIds(readSessionJson('episodes', []));
+		writeSessionValue('episodes', JSON.stringify(cachedItems));
+
 		return {
-			items: readSessionJson('episodes', []),
+			items: cachedItems,
 			lastFetched: cachedTimestamp,
 			numberOfEpisodes: readSessionNumber('numberOfEpisodes', 0)
 		};
@@ -91,17 +120,21 @@ const getEpisodes = async () => {
 		}
 
 		const data = await response.json();
+		const itemsWithIds = assignEpisodeIds(Array.isArray(data.items) ? data.items : []);
 		const fetchedAt = Date.now();
 
-		writeSessionValue('episodes', JSON.stringify(Array.isArray(data.items) ? data.items : []));
+		writeSessionValue('episodes', JSON.stringify(itemsWithIds));
 		writeSessionValue('episodesFetchedAt', fetchedAt.toString());
 		writeSessionValue('numberOfEpisodes', String(Number.isFinite(data.numberOfEpisodes) ? data.numberOfEpisodes : 0));
 	} catch (error) {
 		console.error('Error fetching episodes:', error);
 	}
 
+	const storedItems = assignEpisodeIds(readSessionJson('episodes', []));
+	writeSessionValue('episodes', JSON.stringify(storedItems));
+
 	return {
-		items: readSessionJson('episodes', []),
+		items: storedItems,
 		lastFetched: readSessionNumber('episodesFetchedAt'),
 		numberOfEpisodes: readSessionNumber('numberOfEpisodes', 0)
 	};
@@ -210,8 +243,11 @@ const extractEpisodeTopic = (title) => {
 	const normalizedTitle = title.replace(/\s+/g, ' ').trim();
 	const [, topicPartRaw] = normalizedTitle.split(':');
 	const topicPart = topicPartRaw?.split('|')[0]?.trim();
+	const topic = topicPart || normalizedTitle;
 
-	return topicPart || normalizedTitle;
+	if (!topic) return null;
+
+	return topic.charAt(0).toUpperCase() + topic.slice(1);
 };
 
 const formatEpisodeDate = (isoDate) => {
@@ -288,3 +324,53 @@ getEpisodes()
 		renderQuoteCarousel([]);
 		renderLatestEpisodeCard([]);
 	});
+
+
+const redirectToEpisode = (episodeNumber) => {
+	window.location.href = `episodes.html/${episodeNumber}`;
+};
+
+const fillEpisodeCards = async () => {
+	const episodeCards = document.querySelectorAll('.episode-card');
+	if (!episodeCards.length) return;
+
+	const episodes = (await getEpisodes()).items.filter((ep) => ep.episodeId !== null);
+	if (!episodes) return;
+
+	let currentEpisodeNumber = 1;
+	for (const card of episodeCards) {
+		const item = episodes[currentEpisodeNumber - 1];
+		if (!item) break;
+
+		const titleEl = card.querySelector('.episode-title');
+		const numberEl = card.querySelector('.episode-number');
+		const guestEl = card.querySelector('.episode-guest');
+		const dateEl = card.querySelector('.episode-date');
+		const durationEl = card.querySelector('.episode-duration');
+
+		if (titleEl && item.snippet?.title) {
+			titleEl.textContent = extractEpisodeTopic(item.snippet.title);
+		}
+
+		if (numberEl) {
+			numberEl.textContent = `# ${episodes.length - currentEpisodeNumber + 2}`;
+		}
+
+		if (guestEl && item.snippet?.title) {
+			guestEl.textContent = extractGuestName(item.snippet.title);
+		}
+
+		if (dateEl && item.snippet?.publishedAt) {
+			dateEl.textContent = formatEpisodeDate(item.snippet.publishedAt);
+		}
+
+		if (durationEl && item.contentDetails?.duration) {
+			durationEl.textContent = formatDuration(item.contentDetails.duration);
+		}
+
+		card.setAttribute('data-episode-number', currentEpisodeNumber);
+		currentEpisodeNumber++;
+	}
+};
+
+fillEpisodeCards();

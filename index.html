@@ -14,7 +14,7 @@
 <body data-theme="dark">
     <nav class="site-header">
         <div class="header-left">
-            <a href="/" class="logo-link">
+            <a href="./index.html" class="logo-link">
                 <picture>
                     <source srcset="images/logo-dark.png" media="(prefers-color-scheme: light)">
                     <source srcset="images/logo-light.png" media="(prefers-color-scheme: dark)">
@@ -32,24 +32,24 @@
         <div id="header-drawer" class="header-drawer">
             <ul id="header-items" class="header-items">
                 <li>
-                    <a href="/" class="header-item">Acasă</a>
+                    <a href="./index.html" class="header-item">Acasă</a>
                 </li>
 
                 <li>
-                    <a href="/episodes" class="header-item">Toate Episoadele</a>
+                    <a href="#episodes" class="header-item">Toate Episoadele</a>
                 </li>
                 
                 <li>
-                    <a href="/about" class="header-item">Despre</a>
+                    <a href="#themes" class="header-item">Despre</a>
                 </li>
             </ul>
 
             <div id="header-btns" class="header-btns">
-                <a href="/login">
+                <a href="./src/login.html">
                     <button id="login-btn" type="button">Login</button>
                 </a>
 
-                <a href="/signup">
+                <a href="#newsletter">
                     <button id="signup-btn" type="button">Signup</button>
                 </a>
             </div>
@@ -68,8 +68,8 @@
                     <div class="quote-carousel" aria-label="Citate din episoade"></div>
 
                     <div class="hero-ctas">
-                        <button class="btn btn-primary" type="button" onclick="window.location.href='/episodes#latest'">Ascultă ultimul episod</button>
-                        <button class="btn btn-ghost" type="button" onclick="window.location.href='/themes'">Vezi temele fierbinți</button>
+                        <button class="btn btn-primary" type="button" onclick="window.location.href='#episodes'">Ascultă ultimul episod</button>
+                        <button class="btn btn-ghost" type="button" onclick="window.location.href='#themes'">Vezi temele fierbinți</button>
                     </div>
 
                     <div class="hero-metrics" aria-label="Statistici podcast">
@@ -122,6 +122,60 @@
         </section>
 
         <section id="episodes" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Ultimele Episoade</h2>
+                <a href="#episodes" class="section-link">Vezi toate episoadele</a>
+            </div>
+
+            <div class="episodes-grid" aria-label="Grilă cu ultimele episoade">
+                <span class="episode-card" id="episode-card-1">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(1);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-2">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-3">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-4">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(4);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                </span>
+            </div>
             
         </section>
 

@@ -1,0 +1,13 @@
+{
+  "name": "tekwill",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i ./css/tailwind.css -o ./css/index.css --minify",
+    "watch:css": "tailwindcss -i ./css/tailwind.css -o ./css/index.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
