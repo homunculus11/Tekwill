@@ -4,7 +4,15 @@ document.querySelectorAll('[data-scroll]').forEach((btn) => {
 		if (!target) return;
 		const el = document.querySelector(target);
 		if (el) {
-			el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			const header = document.querySelector('.site-header');
+			const headerHeight = header ? header.getBoundingClientRect().height : 0;
+			const extraOffset = 12;
+			const targetTop = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
+
+			window.scrollTo({
+				top: Math.max(targetTop, 0),
+				behavior: 'smooth'
+			});
 		}
 	});
 });
