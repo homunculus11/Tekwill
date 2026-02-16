@@ -389,6 +389,18 @@
       @apply px-[18px] py-14;
     }
 
+    .section-header {
+      @apply flex-col items-stretch gap-3;
+    }
+
+    .section-title {
+      @apply text-[clamp(24px,6vw,32px)];
+    }
+
+    .section-link {
+      @apply w-full justify-center text-center;
+    }
+
     .episodes-grid {
       @apply grid-cols-1;
     }

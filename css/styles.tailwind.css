@@ -174,6 +174,92 @@
   body.nav-open .header-overlay {
     @apply block;
   }
+
+  /* ── Footer ── */
+  .site-footer {
+    @apply relative mt-8 border-t border-border text-text-main;
+    background: linear-gradient(180deg, var(--color-bg-section) 0%, var(--color-bg-main) 100%);
+  }
+
+  .footer-inner {
+    @apply mx-auto max-w-[1200px] px-6 pt-14 pb-8;
+  }
+
+  .footer-top {
+    @apply flex flex-wrap justify-between gap-10;
+  }
+
+  .footer-brand {
+    @apply flex flex-col gap-3;
+  }
+
+  .footer-logo-link {
+    @apply inline-flex w-fit;
+  }
+
+  .footer-logo {
+    @apply block h-11 w-auto object-contain;
+  }
+
+  .footer-tagline {
+    @apply m-0 max-w-[320px] text-sm leading-relaxed text-text-secondary;
+  }
+
+  .footer-nav {
+    @apply flex gap-16;
+  }
+
+  .footer-nav-group {
+    @apply flex flex-col gap-3 items-start;
+  }
+
+  .footer-nav-title {
+    @apply m-0 text-xs font-bold uppercase tracking-[0.08em] text-text-muted;
+  }
+
+  .footer-nav-list {
+    @apply m-0 flex list-none flex-col items-start gap-2 p-0;
+  }
+
+  .footer-link {
+    @apply text-sm font-medium text-text-secondary no-underline transition-colors duration-200;
+  }
+
+  .footer-link:hover {
+    @apply text-primary;
+  }
+
+  .footer-social {
+    @apply flex flex-col items-start gap-3;
+  }
+
+  .footer-social-links {
+    @apply flex items-center gap-2;
+  }
+
+  .footer-social-btn {
+    @apply grid h-10 w-10 place-items-center rounded-xl border border-border bg-bg-card text-text-muted no-underline transition-all duration-200;
+  }
+
+  .footer-social-btn:hover {
+    @apply -translate-y-px border-primary text-primary shadow-sm;
+  }
+
+  .footer-divider {
+    @apply my-8 h-px w-full bg-border;
+  }
+
+  .footer-bottom {
+    @apply flex flex-wrap items-center justify-between gap-4;
+  }
+
+  .footer-copy {
+    @apply m-0 text-sm text-text-muted;
+  }
+
+  .footer-credit {
+    @apply m-0 text-sm text-text-muted;
+  }
 }
 
 @layer utilities {
@@ -228,6 +314,26 @@
     #login-btn,
     #signup-btn {
       @apply w-full text-center;
+    }
+
+    .footer-inner {
+      @apply px-5 pt-10 pb-6;
+    }
+
+    .footer-top {
+      @apply flex-col gap-8;
+    }
+
+    .footer-nav {
+      @apply w-full gap-10;
+    }
+
+    .footer-nav-group {
+      @apply flex-1;
+    }
+
+    .footer-bottom {
+      @apply flex-col items-start gap-2;
     }
   }
 }
