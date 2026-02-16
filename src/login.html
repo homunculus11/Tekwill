@@ -1,11 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Educheia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/index.css">
 </head>
-<body>
-    
+
+<body data-theme="dark">
+    <nav class="site-header">
+        <div class="header-left">
+            <a href="./index.html" class="logo-link">
+                <picture>
+                    <source srcset="images/logo-dark.png" media="(prefers-color-scheme: light)">
+                    <source srcset="images/logo-light.png" media="(prefers-color-scheme: dark)">
+                    <img id="header-logo" src="images/logo-light.png" alt="Educheia Logo">
+                </picture>
+            </a>
+            
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        
+        <div id="header-drawer" class="header-drawer">
+            <ul id="header-items" class="header-items">
+                <li>
+                    <a href="./index.html" class="header-item">Acasă</a>
+                </li>
+
+                <li>
+                    <a href="./src/episodes.html" class="header-item">Toate Episoadele</a>
+                </li>
+                
+                <li>
+                    <a href="./src/themes.html" class="header-item">Despre</a>
+                </li>
+            </ul>
+
+            <div id="header-btns" class="header-btns">
+                <a href="./src/login.html">
+                    <button id="login-btn" type="button">Login</button>
+                </a>
+
+                <a href="./src/signup.html">
+                    <button id="signup-btn" type="button">Signup</button>
+                </a>
+            </div>
+        </div>
+
+        <div class="header-overlay" aria-hidden="true"></div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            
+
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="hero-photo">
+                        <div class="photo-glow"></div>
+                        <img src="images/hero.png" alt="Elena Vorotneac" class="hero-image">
+                        <div class="photo-ring"></div>
+                    </div>
+
+                    <div class="floating-card">
+                        <div class="floating-top">
+                            <span class="floating-status">Episod nou</span>
+                            <span class="floating-time" id="latest-episode-date">35:14</span>
+                        </div>
+                        <p class="floating-title" id="latest-episode-title">„Școala care învață să greșești inteligent”</p>
+                        <div class="floating-wave">
+                            <span></span><span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="floating-actions">
+                            <button class="btn btn-mini">Play 30s</button>
+                            <span class="floating-note" id="latest-episode-guest">Preview exclusiv</span>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge">
+                        <span class="badge-dot"></span>
+                        Top 1 Edu podcast în MD · +1.2K ascultări săptămânale
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="episodes" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Ultimele Episoade</h2>
+                <a href="#episodes" class="section-link">Vezi toate episoadele</a>
+            </div>
+
+            <div class="episodes-grid" aria-label="Grilă cu ultimele episoade">
+                <span class="episode-card" id="episode-card-1">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(1);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
+                            <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-2">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(2);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
+                            <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-3">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
+                            <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
+                        </svg>
+                    </button>
+                </span>
+
+                <span class="episode-card" id="episode-card-4">
+                    <p class="episode-number"></p>
+                    <h3 class="episode-title"></h3>
+                    <p class="episode-guest"></p>
+                    <p class="episode-date"></p>
+                    <button class="play-btn" onclick="redirectToEpisode(4);">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
+                            <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
+                        </svg>
+                    </button>
+                </span>
+            </div>
+            
+        </section>
+
+        <section id="themes" class="section alt">
+            
+        </section>
+
+        <section id="newsletter" class="section">
+            
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
+
 </html>
