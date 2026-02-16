@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #008c9c;
+  --color-primary-hover: #0b7a89;
+  --color-primary-soft: #e3f3f5;
+  --color-bg-main: #f8fafc;
+  --color-bg-section: #eef2f6;
+  --color-bg-card: #ffffff;
+  --color-text-main: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #ffffff;
+  --color-border: #e2e8f0;
+  --color-divider: #cbd5e1;
+  --color-input-bg: #ffffff;
+  --color-input-border: #cbd5e1;
+  --color-input-focus: #2563eb;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #0ea5e9;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.16);
+
+  --bg-deep: #0a0a0b;
+  --bg-card: #13131a;
+  --bg-card-hover: #1a1a24;
+  --accent: #e8c96d;
+  --accent-dim: rgba(232, 201, 109, 0.15);
+  --accent-glow: rgba(232, 201, 109, 0.35);
+  --text-primary: #f0efe8;
+  --text-secondary: #7a7a85;
+  --text-muted: #4e4e56;
+  --border: rgba(255, 255, 255, 0.06);
+  --radius: 16px;
+}
+
+[data-theme='dark'] {
+  --color-primary: #58c7d6;
+  --color-primary-hover: #3eb4c3;
+  --color-primary-soft: #0e2026;
+  --color-bg-main: #0b1220;
+  --color-bg-section: #0f172a;
+  --color-bg-card: #111827;
+  --color-text-main: #e5e7eb;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #0b1220;
+  --color-border: #1f2937;
+  --color-divider: #273449;
+  --color-input-bg: #111827;
+  --color-input-border: #1f2937;
+  --color-input-focus: #60a5fa;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #38bdf8;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.46);
+}
+
+@layer base {
+  nav ul {
+    @apply m-0 flex list-none items-center justify-center gap-4 p-0;
+  }
+}
+
+@layer components {
+  .site-header {
+    @apply sticky top-0 z-20 flex h-20 items-center justify-between gap-4 border border-border px-6 text-text-main shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur-[10px];
+    background: linear-gradient(120deg, var(--color-bg-card) 0%, var(--color-bg-section) 52%, rgba(0, 140, 156, 0.12) 100%);
+  }
+
+  .header-left {
+    @apply flex items-center gap-4;
+  }
+
+  .header-drawer {
+    @apply flex flex-1 items-center justify-start gap-4;
+  }
+
+  .logo-link {
+    @apply inline-flex items-center gap-3 py-[6px] no-underline;
+  }
+
+  #header-logo {
+    @apply block h-[54px] w-auto max-h-20 object-contain;
+  }
+
+  .brand-text {
+    @apply flex flex-col gap-1 leading-[1.1];
+  }
+
+  .brand-name {
+    @apply whitespace-nowrap font-['Montserrat',sans-serif] text-base font-bold uppercase tracking-[2.4px] text-text-main;
+  }
+
+  .brand-tagline {
+    @apply whitespace-nowrap font-['Open_Sans',sans-serif] text-[13px] font-semibold text-text-muted;
+  }
+
+  .header-items {
+    @apply flex flex-1 items-center justify-center gap-4;
+  }
+
+  .header-btns {
+    @apply flex items-center justify-start gap-3;
+  }
+
+  .menu-toggle {
+    @apply hidden h-[42px] w-[42px] cursor-pointer items-center justify-center gap-[6px] rounded-[10px] border border-border bg-bg-card p-[10px] transition-colors duration-200;
+  }
+
+  .menu-toggle span {
+    @apply block h-0.5 w-full bg-text-main transition-all duration-200;
+  }
+
+  body.nav-open .menu-toggle span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  body.nav-open .menu-toggle span:nth-child(2) {
+    @apply opacity-0;
+  }
+
+  body.nav-open .menu-toggle span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  #login-btn {
+    @apply cursor-pointer rounded-xl border-[2px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
+  }
+
+  #login-btn:hover {
+    @apply -translate-y-px text-primary shadow-sm;
+    background-color: #13213a;
+  }
+
+  #signup-btn {
+    @apply cursor-pointer rounded-xl border-[1.5px] border-primary bg-primary px-[18px] py-[9px] text-sm font-bold tracking-[0.2px] text-text-inverse shadow-sm transition-all duration-200;
+  }
+
+  #signup-btn:hover {
+    @apply -translate-y-px bg-primary-hover text-text-inverse shadow-md;
+  }
+
+  #login-btn:focus-visible,
+  #signup-btn:focus-visible,
+  .header-item:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-primary-soft;
+  }
+
+  .header-item {
+    @apply block rounded-[10px] px-[14px] py-3 text-center font-['Montserrat',sans-serif] text-base font-semibold tracking-[0.5px] text-text-main no-underline transition-all duration-200;
+  }
+
+  .header-item:hover {
+    @apply -translate-y-px bg-primary-soft text-primary shadow-sm;
+  }
+
+  .header-item.active {
+    @apply bg-primary-soft font-bold text-primary;
+  }
+
+  .header-overlay {
+    @apply fixed inset-0 z-10 hidden bg-black/40 backdrop-blur-[2px];
+  }
+
+  body.nav-open .header-overlay {
+    @apply block;
+  }
+}
+
+@layer utilities {
+  @media (max-width: 900px) {
+    .site-header {
+      @apply px-4 py-[10px];
+    }
+
+    .header-left {
+      @apply w-full justify-between;
+    }
+
+    #header-logo {
+      @apply h-12 rounded-xl px-2 py-[6px];
+      zoom: 100%;
+    }
+
+    .logo-link {
+      @apply gap-[10px];
+    }
+
+    .brand-text {
+      @apply gap-0.5;
+    }
+
+    .brand-tagline {
+      @apply hidden;
+    }
+
+    .menu-toggle {
+      @apply inline-flex;
+    }
+
+    .header-drawer {
+      @apply fixed left-3 right-3 top-[72px] z-20 max-h-0 flex-col items-start gap-3 overflow-hidden border border-border bg-bg-card p-0 opacity-0 shadow-md transition-all duration-200;
+      border-radius: 14px;
+    }
+
+    body.nav-open .header-drawer {
+      @apply max-h-[460px] px-[14px] pb-4 pt-3 opacity-100;
+    }
+
+    .header-items {
+      @apply w-full flex-col items-start gap-1;
+    }
+
+    .header-btns {
+      @apply grid w-full grid-cols-2 justify-start gap-[10px];
+    }
+
+    .header-btns a,
+    #login-btn,
+    #signup-btn {
+      @apply w-full text-center;
+    }
+  }
+}
