@@ -297,6 +297,129 @@ const renderLatestEpisodeCard = (items) => {
 	latestGuestEl.textContent = guest ? guest : 'Invitat special';
 };
 
+const getRecentGuests = (items, limit = 6) => {
+	if (!Array.isArray(items)) return [];
+
+	const guests = [];
+	const seen = new Set();
+
+	for (const item of items) {
+		const rawTitle = item?.snippet?.title;
+		if (!rawTitle || /trailer/i.test(rawTitle)) continue;
+
+		const guestName = extractGuestName(rawTitle);
+		if (!guestName) continue;
+
+		const normalizedKey = guestName.toLowerCase().trim();
+		if (seen.has(normalizedKey)) continue;
+
+		seen.add(normalizedKey);
+		const thumbnail = item?.snippet?.thumbnails?.high?.url
+			|| item?.snippet?.thumbnails?.medium?.url
+			|| item?.snippet?.thumbnails?.default?.url
+			|| null;
+
+		guests.push({
+			name: guestName,
+			episodeTopic: extractEpisodeTopic(rawTitle),
+			date: formatEpisodeDate(item?.snippet?.publishedAt || item?.contentDetails?.videoPublishedAt),
+			image: thumbnail,
+			description: item?.snippet?.description || ''
+		});
+
+		if (guests.length >= limit) break;
+	}
+
+	return guests;
+};
+
+const extractFacebookLink = (description, guestName) => {
+	if (typeof description === 'string') {
+		const match = description.match(/https?:\/\/(?:www\.)?facebook\.com\/[\w\-.?=&/%]+/i);
+		if (match?.[0]) {
+			return match[0].replace(/[),.;]+$/, '');
+		}
+	}
+
+	const query = encodeURIComponent(guestName || 'Educheia');
+	return `https://www.facebook.com/search/top/?q=${query}`;
+};
+
+const renderRecentGuests = (items) => {
+	const guestsGrid = document.getElementById('recent-guests-grid');
+	if (!guestsGrid) return;
+
+	const guests = getRecentGuests(items, 4);
+	guestsGrid.innerHTML = '';
+
+	if (!guests.length) {
+		const emptyState = document.createElement('div');
+		emptyState.className = 'guest-empty';
+		emptyState.textContent = 'Invitații recenți vor apărea aici în curând.';
+		guestsGrid.appendChild(emptyState);
+		return;
+	}
+
+	for (const guest of guests) {
+		const card = document.createElement('a');
+		card.className = 'guest-card';
+		card.href = extractFacebookLink(guest.description, guest.name);
+		card.target = '_blank';
+		card.rel = 'noopener noreferrer';
+
+		const media = document.createElement('div');
+		media.className = 'guest-media';
+
+		if (guest.image) {
+			const image = document.createElement('img');
+			image.className = 'guest-image';
+			image.src = guest.image;
+			image.alt = `Invitat: ${guest.name}`;
+			image.loading = 'lazy';
+			media.appendChild(image);
+		}
+
+		const avatarFallback = document.createElement('div');
+		avatarFallback.className = 'guest-avatar-fallback';
+		avatarFallback.textContent = (guest.name || '?').charAt(0).toUpperCase();
+		media.appendChild(avatarFallback);
+
+		if (guest.image) {
+			const imageElement = media.querySelector('.guest-image');
+			imageElement?.addEventListener('load', () => {
+				avatarFallback.style.display = 'none';
+			});
+
+			imageElement?.addEventListener('error', () => {
+				avatarFallback.style.display = 'grid';
+			});
+
+			if (imageElement?.complete && imageElement.naturalWidth > 0) {
+				avatarFallback.style.display = 'none';
+			}
+		}
+
+		const content = document.createElement('div');
+		content.className = 'guest-content';
+
+		const name = document.createElement('h3');
+		name.className = 'guest-name';
+		name.textContent = guest.name;
+
+		const episode = document.createElement('p');
+		episode.className = 'guest-episode';
+		episode.textContent = guest.episodeTopic || 'Episod recent';
+
+		const date = document.createElement('p');
+		date.className = 'guest-date';
+		date.textContent = `Facebook · ${guest.date || 'Profil invitat'}`;
+
+		content.append(name, episode, date);
+		card.append(media, content);
+		guestsGrid.appendChild(card);
+	}
+};
+
 
 getEpisodes()
 	.then((data) => {
@@ -315,6 +438,7 @@ getEpisodes()
 
 		renderQuoteCarousel(data.items);
 		renderLatestEpisodeCard(data.items);
+		renderRecentGuests(data.items);
 	})
 	.catch((error) => {
 		console.error('Error loading episodes:', error);
@@ -331,6 +455,7 @@ getEpisodes()
 
 		renderQuoteCarousel([]);
 		renderLatestEpisodeCard([]);
+		renderRecentGuests([]);
 	});
 
 

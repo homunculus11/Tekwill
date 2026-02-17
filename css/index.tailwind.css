@@ -350,6 +350,127 @@
     @apply outline outline-2 outline-offset-2 outline-primary-soft;
   }
 
+  .listen-grid {
+    @apply grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-5;
+  }
+
+  .listen-card {
+    @apply relative flex min-h-[170px] flex-col border border-border bg-bg-card px-5 pb-5 pt-4 no-underline shadow-sm transition-all duration-200;
+    border-radius: 18px 20px 16px 18px;
+  }
+
+  .listen-card:hover {
+    @apply -translate-y-1 border-primary shadow-md;
+  }
+
+  .listen-card:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-primary-soft;
+  }
+
+  .listen-top {
+    @apply flex items-center gap-3;
+  }
+
+  .listen-icon {
+    @apply grid h-11 w-11 place-items-center rounded-xl border bg-primary-soft text-primary;
+    border-color: rgba(88, 199, 214, 0.35);
+  }
+
+  .listen-icon svg {
+    @apply h-5 w-5;
+  }
+
+  .listen-platform {
+    @apply text-[18px] font-bold text-text-main;
+  }
+
+  .listen-subtitle {
+    @apply mt-3 text-sm font-semibold text-text-secondary;
+  }
+
+  .listen-action {
+    @apply mt-auto inline-flex w-fit items-center rounded-full border border-border bg-white/5 px-3 py-1.5 text-sm font-semibold text-text-secondary transition-colors duration-200;
+  }
+
+  .listen-card:hover .listen-action {
+    @apply border-primary text-primary;
+  }
+
+  .guests-grid {
+    @apply grid grid-cols-4 gap-5;
+  }
+
+  .guest-card {
+    @apply flex min-h-[300px] flex-col overflow-hidden border border-border bg-bg-card text-text-main no-underline shadow-sm transition-all duration-200;
+    border-radius: 20px 16px 22px 18px;
+  }
+
+  .guest-card:hover {
+    @apply -translate-y-1 border-primary shadow-md;
+  }
+
+  .guest-media {
+    @apply relative h-[170px] border-b border-border bg-slate-900/50;
+  }
+
+  .guest-image {
+    @apply h-full w-full object-cover;
+  }
+
+  .guest-avatar-fallback {
+    @apply absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_20%_20%,rgba(88,199,214,0.4),rgba(15,23,42,0.95))] text-[40px] font-bold text-text-inverse;
+  }
+
+  .guest-content {
+    @apply flex flex-1 flex-col px-5 pb-5 pt-4;
+  }
+
+  .guest-name {
+    @apply m-0 text-lg font-bold leading-[1.25] text-text-main;
+  }
+
+  .guest-episode {
+    @apply mt-2 text-sm font-semibold leading-[1.45] text-text-secondary;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .guest-date {
+    @apply mt-auto pt-3 text-sm text-text-muted;
+  }
+
+  .guest-empty {
+    @apply border border-dashed border-border bg-bg-card px-5 py-8 text-center text-text-secondary;
+    border-radius: 16px 20px 14px 18px;
+  }
+
+  .final-cta {
+    @apply pt-6;
+  }
+
+  .final-cta-card {
+    @apply border border-border bg-bg-card px-[clamp(20px,4vw,42px)] py-[clamp(24px,4.5vw,40px)] shadow-md;
+    border-radius: 26px 20px 30px 18px;
+  }
+
+  .final-cta-title {
+    @apply m-0 max-w-[850px] text-[clamp(26px,4vw,40px)] font-bold leading-[1.08] text-text-main;
+  }
+
+  .final-cta-text {
+    @apply mb-0 mt-3 max-w-[640px] text-lg text-text-secondary;
+  }
+
+  .final-cta-actions {
+    @apply mt-6 flex flex-wrap gap-3;
+  }
+
+  .final-cta-link {
+    @apply inline-flex items-center justify-center no-underline;
+  }
+
 }
 
 @layer utilities {
@@ -372,6 +493,19 @@
 
     .episodes-grid {
       @apply grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4;
+    }
+
+    .listen-grid,
+    .guests-grid {
+      @apply grid-cols-2;
+    }
+
+    .guest-card {
+      @apply min-h-[280px];
+    }
+
+    .guest-media {
+      @apply h-[160px];
     }
 
     .floating-card {
@@ -405,12 +539,35 @@
       @apply grid-cols-1;
     }
 
+    .listen-grid,
+    .guests-grid {
+      @apply grid-cols-1;
+    }
+
     .episode-card {
       @apply min-h-[225px] p-[18px];
     }
 
+    .guest-card,
+    .listen-card {
+      @apply min-h-[unset];
+    }
+
+    .guest-media {
+      @apply h-[200px];
+    }
+
     .play-btn {
       @apply h-10 w-10;
+    }
+
+    .final-cta-actions {
+      @apply flex-col;
+    }
+
+    .final-cta-actions .btn,
+    .final-cta-link {
+      @apply w-full;
     }
   }
 }
