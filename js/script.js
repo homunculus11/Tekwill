@@ -733,35 +733,105 @@ const setupReactiveSheen = () => {
 	if (prefersReducedMotion || !hasFinePointer) return;
 
 	const root = document.documentElement;
-	let frameId = null;
-	let nextX = window.innerWidth * 0.5;
-	let nextY = window.innerHeight * 0.28;
+	const getRestingPoint = () => ({
+		x: window.innerWidth * 0.5,
+		y: window.innerHeight * 0.28
+	});
 
-	const updateSheen = () => {
-		frameId = null;
-		root.style.setProperty('--hover-x', `${Math.round(nextX)}px`);
-		root.style.setProperty('--hover-y', `${Math.round(nextY)}px`);
+	const restingPoint = getRestingPoint();
+	const pointer = { x: restingPoint.x, y: restingPoint.y };
+	const core = { x: restingPoint.x, y: restingPoint.y };
+	const trail = { x: restingPoint.x, y: restingPoint.y };
+
+	let frameId = null;
+	let isPointerInside = false;
+	let previousFrameTime = performance.now();
+
+	const writeCssVars = (motionX, motionY, speed) => {
+		const driftX = Math.max(Math.min(motionX * 2.4, 24), -24);
+		const driftY = Math.max(Math.min(motionY * 2.4, 24), -24);
+		const angle = Math.atan2(motionY, motionX) * (180 / Math.PI);
+
+		root.style.setProperty('--hover-x', `${Math.round(core.x)}px`);
+		root.style.setProperty('--hover-y', `${Math.round(core.y)}px`);
+		root.style.setProperty('--hover-lag-x', `${Math.round(trail.x)}px`);
+		root.style.setProperty('--hover-lag-y', `${Math.round(trail.y)}px`);
+		root.style.setProperty('--hover-drift-x', `${driftX.toFixed(2)}px`);
+		root.style.setProperty('--hover-drift-y', `${driftY.toFixed(2)}px`);
+		root.style.setProperty('--hover-angle', `${Number.isFinite(angle) ? angle.toFixed(2) : '0'}deg`);
+		root.style.setProperty('--hover-speed', speed.toFixed(3));
 	};
 
-	const scheduleUpdate = () => {
+	const animate = (time) => {
+		const delta = Math.min(Math.max((time - previousFrameTime) / 16.67, 0.6), 2.2);
+		previousFrameTime = time;
+
+		const coreEase = isPointerInside ? 0.18 : 0.1;
+		const trailEase = isPointerInside ? 0.1 : 0.07;
+
+		core.x += (pointer.x - core.x) * coreEase * delta;
+		core.y += (pointer.y - core.y) * coreEase * delta;
+		trail.x += (core.x - trail.x) * trailEase * delta;
+		trail.y += (core.y - trail.y) * trailEase * delta;
+
+		const motionX = core.x - trail.x;
+		const motionY = core.y - trail.y;
+		const speed = Math.min(Math.hypot(motionX, motionY) / 34, 1);
+
+		writeCssVars(motionX, motionY, speed);
+
+		const settled = Math.abs(pointer.x - core.x) < 0.15
+			&& Math.abs(pointer.y - core.y) < 0.15
+			&& Math.abs(core.x - trail.x) < 0.15
+			&& Math.abs(core.y - trail.y) < 0.15;
+
+		if (!isPointerInside && settled) {
+			frameId = null;
+			return;
+		}
+
+		frameId = requestAnimationFrame(animate);
+	};
+
+	const ensureAnimation = () => {
 		if (frameId !== null) return;
-		frameId = requestAnimationFrame(updateSheen);
+		previousFrameTime = performance.now();
+		frameId = requestAnimationFrame(animate);
 	};
 
 	window.addEventListener('pointermove', (event) => {
-		nextX = event.clientX;
-		nextY = event.clientY;
-		scheduleUpdate();
+		pointer.x = event.clientX;
+		pointer.y = event.clientY;
+		isPointerInside = true;
+		ensureAnimation();
+	}, { passive: true });
+
+	window.addEventListener('pointerdown', (event) => {
+		pointer.x = event.clientX;
+		pointer.y = event.clientY;
+		isPointerInside = true;
+		ensureAnimation();
 	}, { passive: true });
 
 	window.addEventListener('pointerleave', () => {
-		nextX = window.innerWidth * 0.5;
-		nextY = window.innerHeight * 0.28;
-		scheduleUpdate();
+		const nextRestingPoint = getRestingPoint();
+		pointer.x = nextRestingPoint.x;
+		pointer.y = nextRestingPoint.y;
+		isPointerInside = false;
+		ensureAnimation();
 	});
 
-	window.addEventListener('resize', scheduleUpdate, { passive: true });
-	scheduleUpdate();
+	window.addEventListener('resize', () => {
+		if (!isPointerInside) {
+			const nextRestingPoint = getRestingPoint();
+			pointer.x = nextRestingPoint.x;
+			pointer.y = nextRestingPoint.y;
+		}
+		ensureAnimation();
+	}, { passive: true });
+
+	writeCssVars(0, 0, 0);
+	ensureAnimation();
 };
 
 setupReactiveSheen();

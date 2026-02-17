@@ -595,12 +595,32 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.62;
   background:
-    radial-gradient(280px 180px at var(--hover-x) var(--hover-y), rgba(109, 186, 198, 0.2), rgba(109, 186, 198, 0) 72%),
-    conic-gradient(from 200deg at var(--hover-x) var(--hover-y), rgba(120, 114, 184, 0.12), rgba(109, 186, 198, 0.04), rgba(120, 114, 184, 0.12));
+    radial-gradient(360px 240px at var(--hover-lag-x) var(--hover-lag-y), rgba(109, 186, 198, 0.22), rgba(109, 186, 198, 0) 76%),
+    radial-gradient(160px 110px at var(--hover-x) var(--hover-y), rgba(142, 208, 217, calc(0.16 + (var(--hover-speed) * 0.26))), rgba(142, 208, 217, 0) 72%),
+    radial-gradient(70px 52px at calc(var(--hover-x) + var(--hover-drift-x)) calc(var(--hover-y) + var(--hover-drift-y)), rgba(167, 182, 240, calc(0.18 + (var(--hover-speed) * 0.3))), rgba(167, 182, 240, 0) 100%),
+    conic-gradient(from calc(170deg + var(--hover-angle)) at var(--hover-x) var(--hover-y), rgba(120, 114, 184, 0.16), rgba(109, 186, 198, 0.06), rgba(120, 114, 184, 0.16));
+  filter: saturate(calc(1 + (var(--hover-speed) * 0.5)));
   mask-image: radial-gradient(120% 85% at 50% -6%, black 22%, transparent 76%);
-  transition: opacity 220ms ease;
+  transform: translateZ(0);
+  transition: opacity 220ms ease, filter 160ms ease;
+  animation: cursor-aura-breathe 6.4s ease-in-out infinite;
+}
+
+@keyframes cursor-aura-breathe {
+  0%,
+  100% {
+    opacity: 0.58;
+  }
+
+  40% {
+    opacity: 0.68;
+  }
+
+  62% {
+    opacity: 0.63;
+  }
 }
 
 ::selection {
@@ -868,7 +888,7 @@ main {
   }
 
   body::after {
-    opacity: 0.3;
+    opacity: 0.34;
   }
 }
 
@@ -891,6 +911,6 @@ main {
   }
 
   body::after {
-    opacity: 0.22;
+    opacity: 0.24;
   }
 }
