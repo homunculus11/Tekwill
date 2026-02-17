@@ -71,6 +71,9 @@ Use repository-safe relative/hash links in HTML (already applied in `index.html`
 - `index.html` – main landing page
 - `prototype.html` – extra/prototype page
 - `src/login.html` – login page
+- `src/signup.html` – signup page
+- `src/episodes.html` – episodes page scaffold
+- `src/themes.html` – about/themes page scaffold
 - `js/script.js` – frontend behavior and data fetch logic
 - `css/styles.css` – shared design tokens (colors and related CSS variables)
 - `*.tailwind.css` – Tailwind source styles (auto-discovered)

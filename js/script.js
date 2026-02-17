@@ -667,7 +667,7 @@ const getChannelStats = async () => {
 	const cachedTimestamp = readSessionNumber('channelFetchedAt');
 
 	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
-		const cachedChannel = readSessionJson('channel', []);
+		const cachedChannel = readSessionJson('channel', {});
 		writeSessionValue('channel', JSON.stringify(cachedChannel));
 
 		return {
@@ -685,13 +685,13 @@ const getChannelStats = async () => {
 		const data = await response.json();
 		const fetchedAt = Date.now();
 
-		writeSessionValue('channel', JSON.stringify(data.channelInfo || []));
+		writeSessionValue('channel', JSON.stringify(data.channelInfo || {}));
 		writeSessionValue('channelFetchedAt', fetchedAt.toString());
  	} catch (error) {
 		console.error('Error fetching channel:', error);
 	}
 
-	const storedChannel = readSessionJson('channel', []);
+	const storedChannel = readSessionJson('channel', {});
 	writeSessionValue('channel', JSON.stringify(storedChannel));
 
 	return {
@@ -702,13 +702,17 @@ const getChannelStats = async () => {
 
 getChannelStats()
 	.then((data) => {
-		const listeners = data.channel.statistics.subscriberCount ?? null;
+		const listeners = data.channel?.statistics?.subscriberCount ?? null;
 		const listenersElement = document.getElementById('nr-of-listeners');
 		setMetricValue(listenersElement, listeners);
 
 		const floatingBadge = document.querySelector('.floating-badge');
 		if (floatingBadge) {
-			floatingBadge.textContent = `Top 1 Edu podcast în MD · + ${formatCompactNumber(parseInt(listeners))} ascultări săptămânale`;
+			const parsedListeners = Number.parseInt(listeners, 10);
+			const formattedListeners = Number.isFinite(parsedListeners) ? formatCompactNumber(parsedListeners) : null;
+			floatingBadge.textContent = formattedListeners
+				? `Top 1 Edu podcast în MD · + ${formattedListeners} ascultări săptămânale`
+				: 'Top 1 Edu podcast în MD';
 		}
 	})
 	.catch((error) => {
