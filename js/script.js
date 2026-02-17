@@ -80,38 +80,12 @@ const readSessionJson = (key, fallback) => {
 	}
 };
 
-const assignEpisodeIds = (items) => {
-	if (!Array.isArray(items)) return [];
-
-	let nextEpisodeId = 1;
-
-	return items.map((item) => {
-		const title = item?.snippet?.title;
-		const isValidEpisode = typeof title === 'string' && title.trim() && !/trailer/i.test(title);
-
-		if (!isValidEpisode) {
-			return {
-				...item,
-				episodeId: null
-			};
-		}
-
-		const episodeWithId = {
-			...item,
-			episodeId: nextEpisodeId
-		};
-
-		nextEpisodeId += 1;
-		return episodeWithId;
-	});
-};
-
 const getEpisodes = async () => {
 	const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 	const cachedTimestamp = readSessionNumber('episodesFetchedAt');
 
 	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
-		const cachedItems = assignEpisodeIds(readSessionJson('episodes', []));
+		const cachedItems = readSessionJson('episodes', []);
 		writeSessionValue('episodes', JSON.stringify(cachedItems));
 
 		return {
@@ -128,17 +102,16 @@ const getEpisodes = async () => {
 		}
 
 		const data = await response.json();
-		const itemsWithIds = assignEpisodeIds(Array.isArray(data.items) ? data.items : []);
 		const fetchedAt = Date.now();
 
-		writeSessionValue('episodes', JSON.stringify(itemsWithIds));
+		writeSessionValue('episodes', JSON.stringify(data.items || []));
 		writeSessionValue('episodesFetchedAt', fetchedAt.toString());
 		writeSessionValue('numberOfEpisodes', String(Number.isFinite(data.numberOfEpisodes) ? data.numberOfEpisodes : 0));
 	} catch (error) {
 		console.error('Error fetching episodes:', error);
 	}
 
-	const storedItems = assignEpisodeIds(readSessionJson('episodes', []));
+	const storedItems = readSessionJson('episodes', []);
 	writeSessionValue('episodes', JSON.stringify(storedItems));
 
 	return {
@@ -467,7 +440,7 @@ const fillEpisodeCards = async () => {
 	const episodeCards = document.querySelectorAll('.episode-card');
 	if (!episodeCards.length) return;
 
-	const episodes = (await getEpisodes()).items.filter((ep) => ep.episodeId !== null);
+	const episodes = (await getEpisodes()).items.filter((ep) => ep.contentDetails.videoId !== null);
 	if (!episodes) return;
 
 	let currentEpisodeNumber = 1;
@@ -499,6 +472,11 @@ const fillEpisodeCards = async () => {
 
 		if (durationEl && item.contentDetails?.duration) {
 			durationEl.textContent = formatDuration(item.contentDetails.duration);
+		}
+
+		const playBtn = card.querySelector(`#play-btn-${currentEpisodeNumber}`);
+		if (playBtn) {
+			playBtn.addEventListener('click', () => redirectToEpisode(item.contentDetails.videoId));
 		}
 
 		card.setAttribute('data-episode-number', currentEpisodeNumber);
