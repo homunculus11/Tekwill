@@ -80,6 +80,56 @@ const readSessionJson = (key, fallback) => {
 	}
 };
 
+const formatCompactNumber = (value) => {
+	if (!Number.isFinite(value)) return null;
+
+	const absValue = Math.abs(value);
+	const units = [
+		{ threshold: 1_000_000_000, suffix: 'B' },
+		{ threshold: 1_000_000, suffix: 'M' },
+		{ threshold: 1_000, suffix: 'K' }
+	];
+
+	for (const unit of units) {
+		if (absValue >= unit.threshold) {
+			const scaled = value / unit.threshold;
+			const rounded = Math.abs(scaled) >= 100 ? Math.round(scaled) : Number(scaled.toFixed(1));
+			return `${rounded}${unit.suffix}`;
+		}
+	}
+
+	return String(Math.round(value));
+};
+
+const setMetricValue = (element, rawValue, fallback = '...') => {
+	if (!element) return;
+	if (rawValue === null || rawValue === undefined) {
+		element.textContent = fallback;
+		return;
+	}
+
+	const textValue = String(rawValue).trim();
+	if (!textValue || textValue === '...') {
+		element.textContent = fallback;
+		return;
+	}
+
+	element.textContent = textValue;
+	if (element.scrollWidth <= element.clientWidth) {
+		return;
+	}
+
+	const numericValue = Number.parseFloat(textValue.replace(/,/g, ''));
+	if (Number.isNaN(numericValue)) {
+		return;
+	}
+
+	const compactValue = formatCompactNumber(numericValue);
+	if (compactValue) {
+		element.textContent = compactValue;
+	}
+};
+
 const getEpisodes = async () => {
 	const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 	const cachedTimestamp = readSessionNumber('episodesFetchedAt');
@@ -401,46 +451,38 @@ getEpisodes()
 		const episodeCountElement = document.getElementById('nr-of-episodes');
 		const guestCountElement = document.getElementById('nr-of-guests');
 
-		if (episodeCountElement) {
-			episodeCountElement.textContent = String(episodeCount);
-		}
-
-		if (guestCountElement) {
-			guestCountElement.textContent = guestCount ? String(guestCount) : '...';
-		}
+		setMetricValue(episodeCountElement, episodeCount);
+		setMetricValue(guestCountElement, guestCount || null);
 
 		renderQuoteCarousel(data.items);
 		renderLatestEpisodeCard(data.items);
 		renderRecentGuests(data.items);
+		fillEpisodeCards(data.items);
 	})
 	.catch((error) => {
 		console.error('Error loading episodes:', error);
 		const episodeCountElement = document.getElementById('nr-of-episodes');
 		const guestCountElement = document.getElementById('nr-of-guests');
 
-		if (episodeCountElement) {
-			episodeCountElement.textContent = '...';
-		}
-
-		if (guestCountElement) {
-			guestCountElement.textContent = '...';
-		}
+		setMetricValue(episodeCountElement, null);
+		setMetricValue(guestCountElement, null);
 
 		renderQuoteCarousel([]);
 		renderLatestEpisodeCard([]);
 		renderRecentGuests([]);
+		fillEpisodeCards([]);
 	});
 
 
-const redirectToEpisode = (episodeNumber) => {
-	window.location.href = `episodes.html/${episodeNumber}`;
+const redirectToEpisode = (episodeId) => {
+	window.location.href = `episodes.html/${episodeId}`;
 };
 
-const fillEpisodeCards = async () => {
+const fillEpisodeCards = async (data) => {
 	const episodeCards = document.querySelectorAll('.episode-card');
 	if (!episodeCards.length) return;
 
-	const episodes = (await getEpisodes()).items.filter((ep) => ep.contentDetails.videoId !== null);
+	const episodes = data.filter((ep) => ep.contentDetails.videoId !== null);
 	if (!episodes) return;
 
 	let currentEpisodeNumber = 1;
@@ -484,4 +526,53 @@ const fillEpisodeCards = async () => {
 	}
 };
 
-fillEpisodeCards();
+const getChannelStats = async () => {
+	const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+	const cachedTimestamp = readSessionNumber('channelFetchedAt');
+
+	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
+		const cachedChannel = readSessionJson('channel', []);
+		writeSessionValue('channel', JSON.stringify(cachedChannel));
+
+		return {
+			channel: cachedChannel,
+			lastFetched: cachedTimestamp,
+		};
+	}
+
+	try {
+		const response = await fetch('https://tekwill-serverless.orletchi-bogdan2009.workers.dev/channel');
+		if (!response.ok) {
+			throw new Error(`Episodes request failed: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const fetchedAt = Date.now();
+
+		writeSessionValue('channel', JSON.stringify(data.channelInfo || []));
+		writeSessionValue('channelFetchedAt', fetchedAt.toString());
+ 	} catch (error) {
+		console.error('Error fetching channel:', error);
+	}
+
+	const storedChannel = readSessionJson('channel', []);
+	writeSessionValue('channel', JSON.stringify(storedChannel));
+
+	return {
+		channel: storedChannel,
+		lastFetched: readSessionNumber('channelFetchedAt'),
+	};
+};
+
+getChannelStats()
+	.then((data) => {
+		const listeners = data.channel.statistics.subscriberCount ?? null;
+		const listenersElement = document.getElementById('nr-of-listeners');
+		setMetricValue(listenersElement, listeners);
+	})
+	.catch((error) => {
+		console.error('Error loading channel stats:', error);
+		const listenersElement = document.getElementById('nr-of-listeners');
+		setMetricValue(listenersElement, null);
+	});
+
