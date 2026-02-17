@@ -721,3 +721,44 @@ getChannelStats()
 		syncLoadingState();
 	});
 
+const setupReactiveSheen = () => {
+	if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+	if (prefersReducedMotion || !hasFinePointer) return;
+
+	const root = document.documentElement;
+	let frameId = null;
+	let nextX = window.innerWidth * 0.5;
+	let nextY = window.innerHeight * 0.28;
+
+	const updateSheen = () => {
+		frameId = null;
+		root.style.setProperty('--hover-x', `${Math.round(nextX)}px`);
+		root.style.setProperty('--hover-y', `${Math.round(nextY)}px`);
+	};
+
+	const scheduleUpdate = () => {
+		if (frameId !== null) return;
+		frameId = requestAnimationFrame(updateSheen);
+	};
+
+	window.addEventListener('pointermove', (event) => {
+		nextX = event.clientX;
+		nextY = event.clientY;
+		scheduleUpdate();
+	}, { passive: true });
+
+	window.addEventListener('pointerleave', () => {
+		nextX = window.innerWidth * 0.5;
+		nextY = window.innerHeight * 0.28;
+		scheduleUpdate();
+	});
+
+	window.addEventListener('resize', scheduleUpdate, { passive: true });
+	scheduleUpdate();
+};
+
+setupReactiveSheen();
+

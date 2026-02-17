@@ -198,7 +198,7 @@
   }
 
   .footer-logo {
-    @apply block h-11 w-auto object-contain;
+    @apply block h-16 w-auto object-contain;
   }
 
   .footer-tagline {
