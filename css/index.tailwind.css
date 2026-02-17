@@ -25,7 +25,7 @@
   }
 
   .hero {
-    @apply relative isolate overflow-hidden px-6 pb-[110px] pt-[72px];
+    @apply relative isolate overflow-visible px-6 pb-[110px] pt-[72px];
   }
 
   .hero::before,
@@ -42,8 +42,9 @@
   }
 
   .hero::after {
+    inset: 0 0 -120px 0;
     @apply opacity-60;
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0));
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.18) 0%, rgba(15, 23, 42, 0.08) 62%, rgba(15, 23, 42, 0) 100%);
   }
 
   .hero-inner {
@@ -273,6 +274,11 @@
 
   .section {
     @apply relative mx-auto w-full max-w-[1200px] px-6 py-16;
+  }
+
+  .hero + .section {
+    margin-top: -72px;
+    padding-top: calc(4rem + 72px);
   }
 
   .section.alt {

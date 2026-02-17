@@ -101,32 +101,105 @@ const formatCompactNumber = (value) => {
 	return String(Math.round(value));
 };
 
+const metricAnimations = new WeakMap();
+
+const easeOutCubic = (progress) => 1 - Math.pow(1 - progress, 3);
+
+const stopMetricAnimation = (element) => {
+	if (!element) return;
+	const previousAnimation = metricAnimations.get(element);
+	if (previousAnimation) {
+		cancelAnimationFrame(previousAnimation);
+		metricAnimations.delete(element);
+	}
+};
+
+const animateMetricValue = (element, targetValue, duration = 1200, onComplete = null) => {
+	if (!element) return;
+
+	stopMetricAnimation(element);
+
+	const currentText = (element.textContent || '').trim();
+	const currentNumeric = Number.parseFloat(currentText.replace(/,/g, ''));
+	const startValue = Number.isFinite(currentNumeric) ? currentNumeric : 0;
+
+	if (!Number.isFinite(targetValue)) {
+		element.textContent = '...';
+		if (typeof onComplete === 'function') onComplete();
+		return;
+	}
+
+	if (Math.round(startValue) === Math.round(targetValue)) {
+		element.textContent = String(Math.round(targetValue));
+		if (typeof onComplete === 'function') onComplete();
+		return;
+	}
+
+	const animationDuration = Math.max(500, duration);
+	const startedAt = performance.now();
+
+	const tick = (now) => {
+		const elapsed = now - startedAt;
+		const progress = Math.min(elapsed / animationDuration, 1);
+		const easedProgress = easeOutCubic(progress);
+		const nextValue = startValue + (targetValue - startValue) * easedProgress;
+
+		element.textContent = String(Math.round(nextValue));
+
+		if (progress < 1) {
+			const frameId = requestAnimationFrame(tick);
+			metricAnimations.set(element, frameId);
+			return;
+		}
+
+		element.textContent = String(Math.round(targetValue));
+		metricAnimations.delete(element);
+		if (typeof onComplete === 'function') onComplete();
+	};
+
+	const frameId = requestAnimationFrame(tick);
+	metricAnimations.set(element, frameId);
+};
+
 const setMetricValue = (element, rawValue, fallback = '...') => {
 	if (!element) return;
 	if (rawValue === null || rawValue === undefined) {
+		stopMetricAnimation(element);
 		element.textContent = fallback;
 		return;
 	}
 
 	const textValue = String(rawValue).trim();
 	if (!textValue || textValue === '...') {
+		stopMetricAnimation(element);
 		element.textContent = fallback;
 		return;
 	}
 
-	element.textContent = textValue;
-	if (element.scrollWidth <= element.clientWidth) {
-		return;
-	}
-
 	const numericValue = Number.parseFloat(textValue.replace(/,/g, ''));
-	if (Number.isNaN(numericValue)) {
-		return;
-	}
+	if (Number.isFinite(numericValue)) {
+		animateMetricValue(element, numericValue, 1200, () => {
+			if (element.scrollWidth <= element.clientWidth) {
+				return;
+			}
 
-	const compactValue = formatCompactNumber(numericValue);
-	if (compactValue) {
-		element.textContent = compactValue;
+			const compactValue = formatCompactNumber(numericValue);
+			if (compactValue) {
+				element.textContent = compactValue;
+			}
+		});
+	} else {
+		stopMetricAnimation(element);
+		element.textContent = textValue;
+		if (element.scrollWidth > element.clientWidth) {
+			const maybeNumeric = Number.parseFloat(textValue.replace(/,/g, ''));
+			if (Number.isFinite(maybeNumeric)) {
+				const compactValue = formatCompactNumber(maybeNumeric);
+				if (compactValue) {
+					element.textContent = compactValue;
+				}
+			}
+		}
 	}
 };
 
@@ -443,6 +516,65 @@ const renderRecentGuests = (items) => {
 	}
 };
 
+const renderRecentGuestsSkeleton = (count = 4) => {
+	const guestsGrid = document.getElementById('recent-guests-grid');
+	if (!guestsGrid) return;
+
+	guestsGrid.innerHTML = '';
+
+	for (let index = 0; index < count; index++) {
+		const card = document.createElement('div');
+		card.className = 'guest-card guest-card-skeleton';
+		card.setAttribute('aria-hidden', 'true');
+
+		const media = document.createElement('div');
+		media.className = 'guest-media';
+
+		const content = document.createElement('div');
+		content.className = 'guest-content';
+
+		const name = document.createElement('p');
+		name.className = 'guest-name';
+
+		const episode = document.createElement('p');
+		episode.className = 'guest-episode';
+
+		const date = document.createElement('p');
+		date.className = 'guest-date';
+
+		content.append(name, episode, date);
+		card.append(media, content);
+		guestsGrid.appendChild(card);
+	}
+};
+
+const loadingState = {
+	episodes: true,
+	channel: true
+};
+
+const loadingTargets = {
+	heroMetrics: document.querySelector('.hero-metrics'),
+	episodesGrid: document.querySelector('.episodes-grid'),
+	recentGuestsGrid: document.getElementById('recent-guests-grid')
+};
+
+const setAriaBusy = (element, isBusy) => {
+	if (!element) return;
+	element.setAttribute('aria-busy', String(isBusy));
+};
+
+const syncLoadingState = () => {
+	const isLoading = loadingState.episodes || loadingState.channel;
+	document.body.classList.toggle('is-data-loading', isLoading);
+	setAriaBusy(loadingTargets.heroMetrics, isLoading);
+	setAriaBusy(loadingTargets.episodesGrid, loadingState.episodes);
+	setAriaBusy(loadingTargets.recentGuestsGrid, loadingState.episodes);
+};
+
+renderRecentGuestsSkeleton();
+syncLoadingState();
+
 
 getEpisodes()
 	.then((data) => {
@@ -471,6 +603,10 @@ getEpisodes()
 		renderLatestEpisodeCard([]);
 		renderRecentGuests([]);
 		fillEpisodeCards([]);
+	})
+	.finally(() => {
+		loadingState.episodes = false;
+		syncLoadingState();
 	});
 
 
@@ -569,10 +705,19 @@ getChannelStats()
 		const listeners = data.channel.statistics.subscriberCount ?? null;
 		const listenersElement = document.getElementById('nr-of-listeners');
 		setMetricValue(listenersElement, listeners);
+
+		const floatingBadge = document.querySelector('.floating-badge');
+		if (floatingBadge) {
+			floatingBadge.textContent = `Top 1 Edu podcast în MD · + ${formatCompactNumber(parseInt(listeners))} ascultări săptămânale`;
+		}
 	})
 	.catch((error) => {
 		console.error('Error loading channel stats:', error);
 		const listenersElement = document.getElementById('nr-of-listeners');
 		setMetricValue(listenersElement, null);
+	})
+	.finally(() => {
+		loadingState.channel = false;
+		syncLoadingState();
 	});
 
