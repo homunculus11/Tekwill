@@ -1,0 +1,35 @@
+/* container positioning for the register box */
+.main-login-box {
+	@apply min-h-[calc(100vh-5rem)] flex items-center justify-center px-6;
+}
+
+/* match the index page’s base body styling so register uses the same background */
+body {
+	@apply m-0 min-h-screen p-0 font-['Manrope',system-ui,-apple-system,sans-serif] text-[17px] leading-[1.6] text-text-main;
+	background: radial-gradient(circle at 14% 18%, rgba(88, 199, 214, 0.12), transparent 34%),
+		radial-gradient(circle at 82% 8%, rgba(94, 234, 212, 0.08), transparent 28%),
+		linear-gradient(160deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0) 35%), var(--color-bg-main);
+}
+
+/* form panel styling */
+.register-form {
+	@apply w-full max-w-lg bg-bg-card bg-opacity-60 backdrop-blur-md p-10 rounded-2xl shadow-md;
+}
+
+.register-form input {
+	@apply w-full px-4 py-2 border border-border bg-transparent text-text-main rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mb-4;
+}
+
+/* Google button variant */
+.btn-google {
+	@apply w-full flex items-center justify-center gap-2 border border-border bg-white/10 text-text-main font-semibold py-2 rounded-lg hover:bg-white/20;
+}
+.btn-google svg {
+	@apply h-5 w-5;
+}
+
+/* ensure nav sits on the same stacking level as on the index page */
+.site-header {
+	z-index: 20;
+}
+
