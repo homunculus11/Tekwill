@@ -1,0 +1,158 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Base & Typography */
+body {
+    @apply bg-bg-main text-text-main font-sans overflow-x-hidden;
+    background: radial-gradient(circle at 12% 10%, rgba(109, 186, 198, 0.14), transparent 36%),
+        radial-gradient(circle at 90% 8%, rgba(120, 114, 184, 0.14), transparent 30%),   
+        linear-gradient(180deg, #0f1524 0%, #0f1524 100%);
+    scrollbar-width: none; /* Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+/* Horizontal Scroll Container */
+.scroll-container {
+    @apply relative w-full;
+    height: 500vh; /* Determines the scroll length */
+}
+
+.sticky-wrapper {
+    @apply sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center;
+    background: #0f1524; /* Solid background to prevent transparency glitch at start */
+    /* If you want gradient: background: linear-gradient(180deg, #0f1524 0%, #0f1524 100%); */
+}
+
+/* Horizontal Track */
+.horizontal-track {
+    @apply flex items-center gap-[10vw] px-[10vw] will-change-transform;
+    width: max-content;
+}
+
+/* Timeline */
+.timeline-container {
+    @apply fixed left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 w-full -z-10 pointer-events-none;
+}
+
+.timeline-line {
+    @apply absolute left-0 top-0 h-full w-full bg-border opacity-30;
+}
+
+.timeline-fill {
+    @apply absolute left-0 top-0 h-full bg-primary origin-left scale-x-0 transition-transform duration-100 ease-linear;
+    box-shadow: 0 0 15px var(--color-primary);
+}
+
+/* Episode Card */
+.episode-card {
+    @apply relative flex-shrink-0 w-[90vw] md:w-[80vw] lg:w-[70vw] aspect-video 
+           bg-bg-card border border-border rounded-3xl overflow-hidden shadow-2xl 
+           transition-all duration-500 ease-out transform;
+    scroll-snap-align: center;
+}
+
+.episode-card.active {
+    @apply border-primary scale-105 shadow-[0_0_50px_rgba(88,199,214,0.2)];
+}
+
+.card-image-wrapper {
+    @apply relative w-full h-full overflow-hidden;
+}
+
+.card-image {
+    @apply w-full h-full object-cover transition-transform duration-700;
+}
+
+.episode-card:hover .card-image {
+    @apply scale-105;
+}
+
+.card-content {
+    @apply absolute bottom-0 left-0 w-full p-8 md:p-12 bg-gradient-to-t from-black via-black/80 to-transparent;
+}
+
+.episode-number {
+    @apply inline-block px-4 py-1.5 mb-3 text-sm font-bold text-primary bg-primary-soft rounded-full uppercase tracking-wider backdrop-blur-sm border border-primary/20;
+}
+
+.episode-title {
+    @apply text-3xl md:text-5xl font-bold leading-tight mb-4 text-white drop-shadow-lg;
+}
+
+.episode-meta {
+    @apply flex items-center gap-6 text-base md:text-lg text-gray-300 mt-4 font-medium;
+}
+
+/* Audio Wave Animation under active card */
+.audio-wave {
+    @apply absolute -bottom-12 left-1/2 -translate-x-1/2 flex items-end gap-1 h-8 opacity-0 transition-opacity duration-300;
+}
+
+.episode-card.active .audio-wave {
+    @apply opacity-100;
+}
+
+.wave-bar {
+    @apply w-1 bg-primary rounded-t-full animate-equalize;
+}
+
+.wave-bar:nth-child(1) { animation-delay: 0.0s; height: 40%; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; height: 70%; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 100%; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; height: 60%; }
+.wave-bar:nth-child(5) { animation-delay: 0.15s; height: 80%; }
+
+/* Player Modal */
+.player-modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-300;
+}
+
+.player-modal.open {
+    @apply opacity-100 pointer-events-auto;
+}
+
+.player-content {
+    @apply relative w-[90vw] max-w-5xl bg-bg-card border border-border rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row;
+    max-height: 90vh;
+}
+
+.player-video {
+    @apply w-full md:w-2/3 aspect-video bg-black;
+}
+
+.player-controls {
+    @apply w-full md:w-1/3 p-6 flex flex-col justify-between border-l border-border;
+}
+
+.close-btn {
+    @apply absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur transition-colors;
+}
+
+.play-mode-toggle {
+    @apply flex gap-2 p-1 bg-slate-800 rounded-lg mb-6;
+}
+
+.mode-btn {
+    @apply flex-1 py-2 text-sm font-semibold text-center rounded-md transition-colors text-text-muted hover:text-white;
+}
+
+.mode-btn.active {
+    @apply bg-primary text-slate-900 shadow-sm;
+}
+
+/* Layout Utilities */
+.section-header-large {
+    @apply absolute top-[10vh] left-[10vw] z-10 max-w-md;
+}
+
+.section-title-large {
+    @apply text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-text-secondary;
+}
+
+.scrolldown-hint {
+    @apply absolute bottom-8 left-1/2 -translate-x-1/2 text-text-muted text-sm animate-bounce;
+}

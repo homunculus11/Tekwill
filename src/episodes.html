@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/episodes.css">
 </head>
 
 <body data-theme="dark">
@@ -45,13 +46,102 @@
         <div class="header-overlay" aria-hidden="true"></div>
     </nav>
 
-    <main>
-        <section class="section" aria-label="Episodes page">
-            <div class="section-header">
-                <h1 class="section-title">Toate Episoadele</h1>
+    <main class="-mt-[100px] relative z-0">
+        <div id="scroll-container" class="relative h-[400vh]">
+            <div class="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center bg-[#0f1524]">
+                
+                <!-- Section Header (Fixed/Parallax) -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 text-center pointer-events-none transition-opacity duration-75" id="section-header">
+                     <h1 class="text-[clamp(4rem,12vw,10rem)] font-bold leading-none text-white/5 select-none whitespace-nowrap">
+                        EPISOADE
+                    </h1>
+                </div>
+
+                <!-- Controls Layout -->
+                <div class="absolute top-24 right-8 z-20 flex gap-4">
+                     <!-- Sort Button -->
+                    <button id="sort-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md transition-all flex items-center gap-2 group">
+                        <svg class="w-4 h-4 text-primary group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                        <span id="sort-label">Cele mai noi</span>
+                    </button>
+                    <!-- To End/Start Button -->
+                    <button id="scroll-jump-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md transition-all flex items-center gap-2">
+                        <span>Spre final</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Horizontal Track -->
+                <div id="horizontal-track" class="flex items-center gap-[5vw] px-[10vw] will-change-transform pt-20 h-full">
+                    <!-- Cards will be injected here via JS -->
+                </div>
+                
+                <!-- Progress Container (Moves with scroll or fixed at bottom?) User said "moves along with episodes" -->
+                <!-- If it moves along with them, it should be INSIDE horizontal-track or implemented as a scrollbar that reflects position better. -->
+                <!-- However, normally progress bars are stationary relative to viewport. -->
+                <!-- "stays centered on the background, instead it should move along with the episodes" -->
+                <!-- I will interpret this as: The bar should be positioned relative to the CAROUSEL content vertically, not the page center. -->
+                <!-- actually, let's put a progress line AT THE BOTTOM of the screen that fills up. -->
+                
+                <div class="fixed bottom-0 left-0 h-1.5 bg-white/10 w-full z-40">
+                     <div id="timeline-fill-bottom" class="h-full bg-primary w-0 shadow-[0_0_15px_rgba(88,199,214,0.8)]"></div>
+                </div>
+
+                <!-- Scroll Hint -->
+                <div class="absolute bottom-12 left-1/2 -translate-x-1/2 text-text-muted text-sm flex flex-col items-center gap-2 animate-pulse" id="scroll-hint">
+
+                    <span class="tracking-widest uppercase text-xs font-semibold">Derulează</span>
+                    <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </div>
             </div>
-            <p class="footer-copy">Pagină de episoade pregătită pentru publicare. Conținutul detaliat poate fi adăugat în această structură.</p>
-        </section>
+        </div>
+
+        <!-- Player Modal -->
+        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
+            <button id="close-player" class="absolute top-6 right-6 z-50 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="relative w-[95vw] h-[85vh] max-w-7xl bg-bg-card border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
+                <!-- Video Section -->
+                <div class="w-full lg:w-[70%] bg-black relative flex items-center justify-center">
+                    <div id="youtube-player-container" class="w-full aspect-video"></div>
+                    <!-- Audio Visualizer Overlay (for Audio Mode) -->
+                    <div id="audio-visualizer" class="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900 hidden flex-col items-center justify-center gap-6">
+                        <div class="relative w-32 h-32 md:w-48 md:h-48 rounded-full border-2 border-primary/30 flex items-center justify-center animate-[pulse_3s_infinite]">
+                            <div class="absolute inset-0 rounded-full bg-primary/10 animate-[ping_2s_infinite]"></div>
+                            <svg class="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                        </div>
+                        <p class="text-white/80 font-mono text-sm tracking-widest uppercase">Audio Only Mode</p>
+                    </div>
+                </div>
+
+                <!-- Content/Controls Section -->
+                <div class="w-full lg:w-[30%] flex flex-col border-l border-white/5 bg-slate-900/50 backdrop-blur-md">
+                    <div class="p-6 md:p-8 flex-1 overflow-y-auto">
+                        <div class="flex items-center gap-2 mb-6">
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold uppercase rounded-full border border-primary/20" id="player-episode-num">EP --</span>
+                            <span class="text-text-muted text-xs font-medium" id="player-date">---</span>
+                        </div>
+                        
+                        <h2 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-4" id="player-title">Titlu Episod</h2>
+                        <p class="text-text-secondary leading-relaxed mb-8" id="player-desc">Descriere scurtă a episodului...</p>
+
+                        <!-- Mode Toggle -->
+                        <div class="bg-black/30 p-1.5 rounded-xl flex items-center gap-1 mb-6 border border-white/5">
+                            <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-white/10 text-white shadow-sm" id="mode-video">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                Video
+                            </button>
+                            <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all text-text-muted hover:text-white hover:bg-white/5" id="mode-audio">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                                Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer class="site-footer">
@@ -63,6 +153,7 @@
     </footer>
 
     <script src="../js/script.js"></script>
+    <script src="../js/episodes.js"></script>
 </body>
 
 </html>
