@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "express": "^5.2.1",
+    "firebase": "^12.9.0",
     "node-fetch": "^3.3.2",
     "url": "^0.11.4"
   }
