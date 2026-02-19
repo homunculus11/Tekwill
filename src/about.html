@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Educheia — Despre</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/styles.css">
+	<link rel="stylesheet" href="../css/about.css">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+</head>
+
+<body data-theme="dark">
+	<div id="reading-progress" aria-hidden="true"></div>
+
+	<nav class="site-header">
+		<div class="header-left">
+			<a href="../index.html" class="logo-link">
+				<picture>
+					<source srcset="../images/logo-dark.png" media="(prefers-color-scheme: light)">
+					<source srcset="../images/logo-light.png" media="(prefers-color-scheme: dark)">
+					<img id="header-logo" src="../images/logo-light.png" alt="Educheia Logo">
+				</picture>
+			</a>
+
+			<button class="menu-toggle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
+		</div>
+
+		<div id="header-drawer" class="header-drawer">
+			<ul id="header-items" class="header-items">
+				<li><a href="../index.html" class="header-item">Acasă</a></li>
+				<li><a href="./episodes.html" class="header-item">Toate Episoadele</a></li>
+				<li><a href="./about.html" class="header-item active">Despre</a></li>
+			</ul>
+
+			<div id="header-btns" class="header-btns">
+				<a href="./login.html" id="login-btn">Login</a>
+				<a href="./register.html" id="signup-btn">Signup</a>
+			</div>
+		</div>
+
+		<div class="header-overlay" aria-hidden="true"></div>
+	</nav>
+
+	<main class="about-main">
+		<section class="about-hero" id="top">
+			<div class="hero-bg-layer layer-one" data-parallax="0.12"></div>
+			<div class="hero-bg-layer layer-two" data-parallax="0.22"></div>
+
+			<div class="about-wrap">
+				<span class="hero-kicker" data-reveal>Manifest Educheia</span>
+				<h1 data-reveal>
+					Nu doar un podcast.<br>
+					<span>Un spațiu unde educația devine conversație vie.</span>
+				</h1>
+				<p class="hero-lead" data-reveal>
+					Educheia aduce împreună profesori, elevi, părinți și lideri pentru a vorbi sincer despre ce funcționează,
+					ce doare și ce putem reconstrui în educație. Fiecare episod caută idei aplicabile, nu doar opinii.
+				</p>
+
+				<div class="hero-quick-grid">
+					<article class="quick-card" data-reveal data-parallax="0.06">
+						<h3>Voce autentică</h3>
+						<p>Dialoguri fără scenariu rigid, cu experiențe reale din școli, comunități și proiecte educaționale.</p>
+					</article>
+					<article class="quick-card" data-reveal data-parallax="0.1">
+						<h3>Impact practic</h3>
+						<p>Fiecare conversație se încheie cu idei clare pe care le poți testa imediat în clasă sau acasă.</p>
+					</article>
+					<article class="quick-card" data-reveal data-parallax="0.14">
+						<h3>Comunitate activă</h3>
+						<p>Ascultătorii propun teme, trimit întrebări și modelează direcția următoarelor episoade.</p>
+					</article>
+				</div>
+
+				<a href="#story" class="hero-scroll-link" data-reveal>
+					Explorează povestea
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m0 0l-6-6m6 6l6-6" />
+					</svg>
+				</a>
+			</div>
+		</section>
+
+		<section class="about-section" id="story">
+			<div class="about-wrap split">
+				<div class="split-copy" data-reveal>
+					<p class="eyebrow">Cum a început</p>
+					<h2>Dintr-o întrebare simplă: „Cum ar arăta educația dacă am asculta mai mult?”</h2>
+					<p>
+						Educheia a pornit ca un experiment audio, într-un studio mic și cu mult curaj. Primul sezon a adus voci
+						din școli, ONG-uri, universități și antreprenoriat educațional. Pe parcurs, proiectul a devenit o platformă
+						unde oamenii nu doar povestesc, ci își pun la lucru ideile împreună.
+					</p>
+					<p>
+						Astăzi, fiecare episod e gândit ca un punct de întâlnire între practică, emoție și direcție strategică.
+						Construcția e simplă: întrebări bune, ascultare reală și o comunitate care vrea schimbare.
+					</p>
+				</div>
+
+				<aside class="story-panel" data-reveal data-parallax="0.08">
+					<h3>Ce găsești în episoade</h3>
+					<ul>
+						<li>modele de predare testate pe teren</li>
+						<li>greșeli valoroase și ce am învățat din ele</li>
+						<li>dialoguri despre motivație, cultură și leadership</li>
+						<li>micro-acțiuni care schimbă dinamica unei clase</li>
+					</ul>
+				</aside>
+			</div>
+		</section>
+
+		<section class="about-section timeline-area" id="timeline">
+			<div class="about-wrap">
+				<p class="eyebrow" data-reveal>Evoluție</p>
+				<h2 class="timeline-title" data-reveal>Drumul Educheia, an cu an</h2>
+
+				<div class="timeline" id="timeline-track">
+					<article class="timeline-step is-active" data-step data-reveal>
+						<span class="year">2022</span>
+						<h3>Primul sezon</h3>
+						<p>Lansăm primele conversații publice cu profesori și lideri educaționali locali.</p>
+					</article>
+					<article class="timeline-step" data-step data-reveal>
+						<span class="year">2023</span>
+						<h3>Comunitate în creștere</h3>
+						<p>Introducem întrebări din partea ascultătorilor și episoade tematice cerute de public.</p>
+					</article>
+					<article class="timeline-step" data-step data-reveal>
+						<span class="year">2024</span>
+						<h3>Format multimedia</h3>
+						<p>Trecem la format video + audio și extindem distribuția pe platforme sociale.</p>
+					</article>
+					<article class="timeline-step" data-step data-reveal>
+						<span class="year">2025</span>
+						<h3>Parteneriate de impact</h3>
+						<p>Dezvoltăm colaborări cu proiecte educaționale pentru a amplifica inițiative locale.</p>
+					</article>
+					<article class="timeline-step" data-step data-reveal>
+						<span class="year">2026</span>
+						<h3>Hub de conversații</h3>
+						<p>Educheia devine o platformă deschisă de idei, mentorat și dialog între generații.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="about-section" id="impact">
+			<div class="about-wrap">
+				<p class="eyebrow" data-reveal>Impact</p>
+				<h2 data-reveal>Cifre care spun o poveste despre încredere</h2>
+
+				<div class="impact-grid">
+					<article class="impact-card" data-reveal>
+						<p class="impact-value" data-counter="120">0</p>
+						<p class="impact-label">episoade publicate</p>
+					</article>
+					<article class="impact-card" data-reveal>
+						<p class="impact-value" data-counter="85">0</p>
+						<p class="impact-label">invitați din educație și leadership</p>
+					</article>
+					<article class="impact-card" data-reveal>
+						<p class="impact-value" data-counter="45">0</p>
+						<p class="impact-label">subiecte cerute de comunitate</p>
+					</article>
+					<article class="impact-card" data-reveal>
+						<p class="impact-value" data-counter="300">0</p>
+						<p class="impact-label">ore de conținut și resurse</p>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="about-section values" id="values">
+			<div class="about-wrap">
+				<p class="eyebrow" data-reveal>Valorile noastre</p>
+				<h2 data-reveal>Principiile care ghidează fiecare conversație</h2>
+
+				<div class="value-cards">
+					<article class="value-card" data-reveal data-parallax="0.05">
+						<h3>Curiozitate activă</h3>
+						<p>Punem întrebări incomode, dar utile, pentru a depăși răspunsurile de suprafață.</p>
+					</article>
+					<article class="value-card" data-reveal data-parallax="0.09">
+						<h3>Claritate peste zgomot</h3>
+						<p>Preferăm idei explicate simplu, acțiuni concrete și context aplicabil.</p>
+					</article>
+					<article class="value-card" data-reveal data-parallax="0.13">
+						<h3>Respect pentru oameni</h3>
+						<p>Ascultăm perspective diferite fără etichete, pentru un dialog care construiește.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="about-section about-cta" id="join">
+			<div class="about-wrap cta-wrap" data-reveal>
+				<h2>Vrei să contribui la un episod viitor?</h2>
+				<p>
+					Trimite o întrebare, o provocare sau o poveste reală din educație. Cele mai valoroase propuneri devin teme în sezonul următor.
+				</p>
+				<div class="cta-actions">
+					<a href="./episodes.html" class="cta-primary">Explorează episoadele</a>
+					<a href="https://t.me/educheia" class="cta-secondary">Propune o temă</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="site-footer">
+		<div class="footer-inner">
+			<div class="footer-top">
+				<div class="footer-brand">
+					<a href="../index.html" class="footer-logo-link">
+						<picture>
+							<source srcset="../images/logo-dark.png" media="(prefers-color-scheme: light)">
+							<source srcset="../images/logo-light.png" media="(prefers-color-scheme: dark)">
+							<img src="../images/logo-light.png" alt="Educheia Logo" class="footer-logo">
+						</picture>
+					</a>
+					<p class="footer-tagline">Un podcast curajos despre educație, oameni și viitor.</p>
+				</div>
+
+				<nav class="footer-nav" aria-label="Footer navigation">
+					<div class="footer-nav-group">
+						<h4 class="footer-nav-title">Navigare</h4>
+						<ul class="footer-nav-list">
+							<li><a href="../index.html" class="footer-link">Acasă</a></li>
+							<li><a href="./episodes.html" class="footer-link">Toate Episoadele</a></li>
+							<li><a href="./about.html" class="footer-link">Despre</a></li>
+						</ul>
+					</div>
+
+					<div class="footer-nav-group">
+						<h4 class="footer-nav-title">Cont</h4>
+						<ul class="footer-nav-list">
+							<li><a href="./login.html" class="footer-link">Login</a></li>
+							<li><a href="./register.html" class="footer-link">Signup</a></li>
+						</ul>
+					</div>
+				</nav>
+
+				<div class="footer-social">
+					<h4 class="footer-nav-title">Urmărește-ne</h4>
+					<div class="footer-social-links">
+						<a href="https://www.youtube.com/@elenavorotneac" class="footer-social-btn" aria-label="YouTube">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+						</a>
+						<a href="https://t.me/educheia" class="footer-social-btn" aria-label="Telegram">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9.036 15.803 8.66 21.09c.538 0 .77-.231 1.05-.508l2.52-2.408 5.222 3.825c.958.528 1.636.25 1.894-.883l3.433-16.086h.001c.304-1.42-.513-1.976-1.447-1.628L1.46 11.012c-1.357.528-1.337 1.286-.231 1.628l5.09 1.586L18.14 6.83c.556-.368 1.062-.165.646.203"/></svg>
+						</a>
+						<a href="https://www.facebook.com/educheia" class="footer-social-btn" aria-label="Facebook">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="footer-divider"></div>
+
+			<div class="footer-bottom">
+				<p class="footer-copy">&copy; 2026 Educheia. Toate drepturile rezervate.</p>
+				<p class="footer-credit">Făcut cu ❤️ pentru educație</p>
+			</div>
+		</div>
+	</footer>
+
+	<script src="../js/script.js"></script>
+	<script src="../js/about.js"></script>
+</body>
+
+</html>
