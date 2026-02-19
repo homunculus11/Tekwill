@@ -15,6 +15,10 @@ body::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
 }
 
+body.player-open {
+    @apply overflow-hidden;
+}
+
 /* Horizontal Scroll Container */
 .scroll-container {
     @apply relative w-full;
@@ -29,8 +33,21 @@ body::-webkit-scrollbar {
 
 /* Horizontal Track */
 .horizontal-track {
-    @apply flex items-center gap-[10vw] px-[10vw] will-change-transform;
+    @apply relative flex items-center gap-[10vw] px-[10vw] will-change-transform;
     width: max-content;
+}
+
+.episodes-track-progress {
+    @apply absolute top-1/2 -translate-y-1/2 h-px pointer-events-none z-0;
+}
+
+.episodes-track-progress-line {
+    @apply absolute inset-0 bg-white/10;
+}
+
+.episodes-track-progress-fill {
+    @apply absolute left-0 top-0 h-full bg-primary w-0;
+    box-shadow: 0 0 15px rgba(88, 199, 214, 0.8);
 }
 
 /* Timeline */
@@ -38,11 +55,11 @@ body::-webkit-scrollbar {
     @apply fixed left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 w-full -z-10 pointer-events-none;
 }
 
-timeline-line {
+.timeline-line {
     @apply absolute left-0 top-0 h-full w-full bg-border opacity-30;
 }
 
-timeline-fill {
+.timeline-fill {
     @apply absolute left-0 top-0 h-full bg-primary origin-left scale-x-0 transition-transform duration-100 ease-linear;
     box-shadow: 0 0 15px var(--color-primary);
 }
@@ -53,10 +70,21 @@ timeline-fill {
            bg-bg-card border border-border rounded-3xl overflow-hidden shadow-2xl 
            transition-all duration-500 ease-out transform;
     scroll-snap-align: center;
+    z-index: 1;
 }
 
 .episode-card.active {
-    @apply border-primary scale-105 shadow-[0_0_50px_rgba(88,199,214,0.2)];
+    @apply border-white/25 scale-[1.01] shadow-xl;
+    z-index: 2;
+}
+
+.episode-card:hover {
+    @apply border-primary scale-[1.03] -translate-y-1.5;
+    box-shadow: 0 30px 70px rgba(4, 10, 24, 0.65), 0 0 34px rgba(88, 199, 214, 0.18);
+}
+
+.episode-card:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-primary;
 }
 
 .card-image-wrapper {
@@ -68,15 +96,46 @@ timeline-fill {
 }
 
 .episode-card:hover .card-image {
-    @apply scale-105;
+    @apply scale-110;
+}
+
+.card-image-wrapper::after {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500;
+    background: linear-gradient(180deg, rgba(4, 10, 24, 0.05), rgba(4, 10, 24, 0.56));
+}
+
+.episode-card:hover .card-image-wrapper::after {
+    @apply opacity-100;
 }
 
 .card-content {
     @apply absolute bottom-0 left-0 w-full p-8 md:p-12 bg-gradient-to-t from-black via-black/80 to-transparent;
 }
 
+.card-play-overlay {
+    @apply absolute inset-0 opacity-0 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px];
+    background: linear-gradient(180deg, rgba(6, 15, 30, 0.08), rgba(6, 15, 30, 0.48));
+}
+
+.episode-card:hover .card-play-overlay,
+.episode-card:focus-within .card-play-overlay {
+    @apply opacity-100;
+}
+
+.card-play-btn {
+    @apply w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary text-slate-900 flex items-center justify-center
+           transform scale-90 transition-transform duration-300;
+    box-shadow: 0 0 30px rgba(88, 199, 214, 0.45);
+}
+
+.episode-card:hover .card-play-btn,
+.episode-card:focus-within .card-play-btn {
+    @apply scale-100;
+}
+
 .episode-number {
-    @apply inline-block px-4 py-1.5 mb-3 text-sm font-bold text-primary bg-primary-soft rounded-full uppercase tracking-wider backdrop-blur-sm border border-primary border-opacity-20;
+    @apply inline-block px-4 py-1.5 mb-3 text-sm font-bold text-primary bg-primary-soft rounded-full uppercase tracking-wider backdrop-blur-sm border border-primary-soft;
 }
 
 .episode-title {
@@ -155,4 +214,166 @@ timeline-fill {
 
 .scrolldown-hint {
     @apply absolute bottom-8 left-1/2 -translate-x-1/2 text-text-muted text-sm animate-bounce;
+}
+
+#scroll-hint.is-dismissed {
+    @apply opacity-0 pointer-events-none;
+    transition: opacity 0.2s ease;
+}
+
+#player-modal.modal-open {
+    @apply opacity-100 pointer-events-auto;
+}
+
+#player-modal #close-player {
+    @apply bg-black/30 backdrop-blur-sm border border-white/10;
+}
+
+#player-modal #close-player:hover {
+    @apply border-white/25;
+}
+
+#player-modal #youtube-player-container {
+    @apply bg-black transition-all duration-300;
+}
+
+#player-modal #youtube-player-container iframe {
+    @apply w-full h-full;
+    pointer-events: none;
+}
+
+#player-modal #youtube-player-container.audio-hidden {
+    @apply opacity-0 invisible;
+}
+
+#player-shell {
+    @apply mt-3;
+}
+
+#player-stage:fullscreen,
+#player-stage:-webkit-full-screen {
+    @apply w-screen h-screen;
+}
+
+#player-stage:fullscreen .player-controls-panel,
+#player-stage:-webkit-full-screen .player-controls-panel {
+    @apply max-w-[min(92vw,920px)];
+}
+
+#player-stage.is-audio-mode {
+    background: radial-gradient(circle at 50% 35%, rgba(88, 199, 214, 0.16), rgba(15, 21, 36, 0.92));
+}
+
+#player-modal #audio-visualizer {
+    background: radial-gradient(circle at 50% 45%, rgba(88, 199, 214, 0.2), transparent 58%),
+        linear-gradient(135deg, rgba(15, 21, 36, 0.92), rgba(16, 32, 56, 0.9));
+}
+
+.player-sidebar {
+    @apply space-y-5;
+}
+
+.player-description {
+    @apply text-sm md:text-base text-white/70 p-4 rounded-xl bg-black/20 border border-white/10;
+    max-height: 9.5rem;
+    overflow: auto;
+}
+
+.player-controls-panel {
+    @apply absolute left-1/2 -translate-x-1/2 bottom-3 z-20 w-[min(94%,820px)] p-2.5 rounded-xl border border-white/10 bg-slate-950/80 backdrop-blur-md space-y-2;
+}
+
+.player-seek-wrap {
+    @apply space-y-1;
+}
+
+.player-time-row {
+    @apply flex items-center justify-between text-[11px] text-white/60 font-medium;
+}
+
+#player-seek,
+#player-volume {
+    @apply w-full;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+#player-seek::-webkit-slider-thumb,
+#player-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(88, 199, 214, 1);
+    border: 0;
+}
+
+#player-seek::-moz-range-thumb,
+#player-volume::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(88, 199, 214, 1);
+    border: 0;
+}
+
+.player-controls-row {
+    @apply flex items-center justify-between gap-3;
+}
+
+.player-left-controls,
+.player-right-controls {
+    @apply flex items-center gap-2;
+}
+
+.player-right-controls {
+    @apply min-w-0;
+}
+
+.icon-btn {
+    @apply h-8 min-w-8 px-2 rounded-lg border border-white/15 bg-white/5 text-white text-xs font-semibold flex items-center justify-center transition-colors;
+}
+
+.icon-btn:hover {
+    @apply bg-white/10 border-white/25;
+}
+
+.icon-btn-primary {
+    @apply bg-primary text-slate-900 border-primary;
+}
+
+.icon-btn-primary:hover {
+    @apply bg-primary;
+    filter: brightness(1.06);
+}
+
+.player-state-label {
+    @apply text-[11px] text-white/60 font-medium tracking-wide;
+}
+
+#player-mute,
+#player-speed,
+#player-fullscreen {
+    @apply h-8 px-2.5 rounded-lg border border-white/10 bg-white/5 text-white text-xs font-semibold;
+}
+
+#player-speed {
+    @apply pr-6;
+}
+
+#player-volume {
+    @apply w-20 md:w-24;
+}
+
+.audio-cover-wrap {
+    box-shadow: 0 30px 55px rgba(2, 6, 17, 0.7), 0 0 26px rgba(88, 199, 214, 0.22);
+}
+
+#mode-video,
+#mode-audio {
+    @apply transition-all duration-200;
 }
