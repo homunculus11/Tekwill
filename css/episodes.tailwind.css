@@ -83,6 +83,10 @@ body.player-open {
     box-shadow: 0 30px 70px rgba(4, 10, 24, 0.65), 0 0 34px rgba(88, 199, 214, 0.18);
 }
 
+.episode-card:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-primary;
+}
+
 .card-image-wrapper {
     @apply relative w-full h-full overflow-hidden;
 }

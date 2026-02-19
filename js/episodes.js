@@ -123,7 +123,7 @@ const setupControls = () => {
             // Re-render
             renderCards();
             // Reset Scroll
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            window.scrollTo({ top: 0, behavior: 'auto' });
             updateScroll();
         });
     }
@@ -175,6 +175,8 @@ const renderCards = () => {
         } else if (ep.videoId) {
             imageUrl = `https://img.youtube.com/vi/${ep.videoId}/hqdefault.jpg`;
         }
+        const safeImageUrl = sanitizeImageUrl(imageUrl);
+        const safeTitle = escapeHtml(ep.title || 'Episod fără titlu');
         
         // Use index for numbering display, but respect sort order
         // If sorting desc (newest first), display numbers N down to 1?
@@ -186,16 +188,19 @@ const renderCards = () => {
         card.className = 'episode-card group';
         card.dataset.index = index;
         card.dataset.id = ep.videoId;
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `Deschide episodul ${displayNum}`);
         
         // Add more top padding inside card or track to center it better?
         // The track has pt-20 now.
         
         card.innerHTML = `
             <div class="card-image-wrapper">
-                <img src="${imageUrl}" alt="${ep.title}" class="card-image" loading="lazy">
+                <img src="${safeImageUrl}" alt="${safeTitle}" class="card-image" loading="lazy" referrerpolicy="no-referrer">
                 <div class="card-content">
                     <span class="episode-number">Episodul ${displayNum}</span>
-                    <h3 class="episode-title">${ep.title}</h3>
+                    <h3 class="episode-title">${safeTitle}</h3>
                     <div class="episode-meta">
                         <span>${formatDate(ep.publishedAt)}</span>
                     </div>
@@ -220,6 +225,12 @@ const renderCards = () => {
         `;
         
         card.addEventListener('click', () => openPlayer(ep));
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openPlayer(ep);
+            }
+        });
         horizontalTrack.appendChild(card);
     });
 
@@ -239,7 +250,7 @@ const setupScroll = () => {
         windowHeight = window.innerHeight;
         updateTrackProgressGeometry();
         updateScroll();
-    });
+    }, { passive: true });
 
     // Throttled scroll handling for performance
     window.addEventListener('scroll', () => {
@@ -263,7 +274,7 @@ const setupScroll = () => {
         }
         
         handleSnap();
-    });
+            }, { passive: true });
     
     updateScroll();
 };
@@ -271,12 +282,15 @@ const setupScroll = () => {
 
 const handleSnap = () => {
     clearTimeout(snapTimeout);
+
+    if (!scrollContainer || !horizontalTrack || !cards?.length) return;
     
     // Only snap if we are distinctly within the scroll container bounds
     // We want to avoid snapping if the user is transitioning in/out of the section.
     const rect = scrollContainer.getBoundingClientRect();
     const containerHeight = rect.height;
     const scrollDistance = containerHeight - windowHeight;
+    if (!Number.isFinite(scrollDistance) || scrollDistance <= 0) return;
     
     // Check if we are in the "active sticky" region.
     // Sticky is active roughly when rect.top <= 0 and rect.bottom >= windowHeight.
@@ -306,6 +320,7 @@ const handleSnap = () => {
         const viewportWidth = window.innerWidth;
         const trackWidth = horizontalTrack.scrollWidth;
         const maxTranslate = trackWidth - viewportWidth; 
+        if (!Number.isFinite(maxTranslate) || maxTranslate <= 0) return;
         
         // Current translation
         const currentProgress = Math.max(0, Math.min(1, -rect.top / scrollDistance));
@@ -377,6 +392,12 @@ const updateScroll = () => {
     // Sticky ends when rect.bottom <= windowHeight.
     
     const scrollDistance = containerHeight - windowHeight;
+    if (!Number.isFinite(scrollDistance) || scrollDistance <= 0) {
+        horizontalTrack.style.transform = 'translate3d(0, 0, 0)';
+        if (timelineFillBottom) timelineFillBottom.style.width = '0%';
+        if (timelineFillTrack) timelineFillTrack.style.width = '0%';
+        return;
+    }
     let progress = -containerTop / scrollDistance;
     
     // Clamp progress 0 to 1
@@ -405,6 +426,13 @@ const updateScroll = () => {
     // Let's just scroll the full width minus one screen width (plus some margin).
     
     const maxTranslate = trackWidth - viewportWidth; 
+    if (!Number.isFinite(maxTranslate) || maxTranslate <= 0) {
+        horizontalTrack.style.transform = 'translate3d(0, 0, 0)';
+        const percentageFallback = `${progress * 100}%`;
+        if (timelineFillBottom) timelineFillBottom.style.width = percentageFallback;
+        if (timelineFillTrack) timelineFillTrack.style.width = percentageFallback;
+        return;
+    }
     
     // Refined Progress Mapping for Centering
     // We can just translate linearly. 
@@ -430,7 +458,7 @@ const updateScroll = () => {
     const currentTranslate = Math.abs(translateX);
     const centerPoint = currentTranslate + (viewportWidth / 2);
     
-    cards.forEach(card => {
+    cards?.forEach(card => {
         const cardLeft = card.offsetLeft;
         const cardWidth = card.offsetWidth;
         const cardCenter = cardLeft + (cardWidth / 2);
@@ -479,10 +507,34 @@ let pendingSeekTime = 0;
 let optimisticTimelineSeconds = null;
 let optimisticTimelineLastTick = 0;
 let seekHoldTargetSeconds = null;
+let youtubeApiRetryCount = 0;
+const MAX_YOUTUBE_API_RETRIES = 50;
 
 const PLAYBACK_MEMORY_KEY = 'episodePlaybackPositions';
 const DEFAULT_QUALITY = 'hd1080';
 const QUALITY_PRIORITY = ['highres', 'hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny'];
+
+const escapeHtml = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const sanitizeImageUrl = (url, fallback = '../images/logo-light.png') => {
+    if (typeof url !== 'string' || !url.trim()) return fallback;
+
+    try {
+        const parsed = new URL(url, window.location.origin);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return parsed.href;
+        }
+    } catch {
+        return fallback;
+    }
+
+    return fallback;
+};
 
 const formatPlaybackTime = (seconds) => {
     const safeSeconds = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
@@ -954,7 +1006,7 @@ const openPlayer = (episode) => {
     document.getElementById('close-player')?.focus();
     
     // Update URL hash without reload
-    history.replaceState(null, '', `#${episode.videoId}`);
+    history.replaceState(null, '', `#${encodeURIComponent(episode.videoId)}`);
 
     loadYoutubeVideo(episode.videoId);
 };
@@ -1005,6 +1057,7 @@ const closePlayer = () => {
 
 const loadYoutubeVideo = (videoId) => {
     if (window.YT && window.YT.Player) {
+        youtubeApiRetryCount = 0;
         if (youtubePlayer) {
             isPlayerReady = true;
             youtubePlayer.cueVideoById({
@@ -1055,6 +1108,12 @@ const loadYoutubeVideo = (videoId) => {
         }
     } else {
         // Retry if API not ready
+        if (youtubeApiRetryCount >= MAX_YOUTUBE_API_RETRIES) {
+            console.error('YouTube API failed to load after retries.');
+            return;
+        }
+
+        youtubeApiRetryCount += 1;
         setTimeout(() => loadYoutubeVideo(videoId), 100);
     }
 };
@@ -1067,6 +1126,8 @@ const setPlayerMode = (mode) => {
     const playerStage = document.getElementById('player-stage');
     const btnVideo = document.getElementById('mode-video');
     const btnAudio = document.getElementById('mode-audio');
+
+    if (!visualizer || !btnVideo || !btnAudio) return;
 
     if (mode === 'audio') {
         visualizer.classList.replace('hidden', 'flex');
@@ -1124,7 +1185,7 @@ const onPlayerStateChange = (event) => {
 };
 
 const checkUrlForEpisode = () => {
-    const hash = window.location.hash.substring(1); // Remove #
+    const hash = decodeURIComponent(window.location.hash.substring(1)); // Remove #
     if (hash && episodes.length > 0) {
         const titleMatch = episodes.find(e => e.videoId === hash);
         if (titleMatch) {

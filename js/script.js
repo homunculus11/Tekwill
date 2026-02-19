@@ -80,13 +80,31 @@ const readSessionJson = (key, fallback) => {
 	}
 };
 
+const API_TIMEOUT_MS = 12000;
+
+const fetchJsonWithTimeout = async (url, timeoutMs = API_TIMEOUT_MS) => {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+	try {
+		const response = await fetch(url, { signal: controller.signal });
+		if (!response.ok) {
+			throw new Error(`Request failed: ${response.status}`);
+		}
+
+		return await response.json();
+	} finally {
+		clearTimeout(timeoutId);
+	}
+};
+
 const getEpisodes = async () => {
 	const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 	const cachedTimestamp = readSessionNumber('episodesFetchedAt');
 
 	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
-		const cachedItems = readSessionJson('episodes', []);
-		writeSessionValue('episodes', JSON.stringify(cachedItems));
+		const cachedItemsRaw = readSessionJson('episodes', []);
+		const cachedItems = Array.isArray(cachedItemsRaw) ? cachedItemsRaw : [];
 
 		return {
 			items: cachedItems,
@@ -96,23 +114,19 @@ const getEpisodes = async () => {
 	}
 
 	try {
-		const response = await fetch('https://tekwill-serverless.orletchi-bogdan2009.workers.dev/episodes');
-		if (!response.ok) {
-			throw new Error(`Episodes request failed: ${response.status}`);
-		}
-
-		const data = await response.json();
+		const data = await fetchJsonWithTimeout('https://tekwill-serverless.orletchi-bogdan2009.workers.dev/episodes');
 		const fetchedAt = Date.now();
+		const items = Array.isArray(data?.items) ? data.items : [];
 
-		writeSessionValue('episodes', JSON.stringify(data.items || []));
+		writeSessionValue('episodes', JSON.stringify(items));
 		writeSessionValue('episodesFetchedAt', fetchedAt.toString());
-		writeSessionValue('numberOfEpisodes', String(Number.isFinite(data.numberOfEpisodes) ? data.numberOfEpisodes : 0));
+		writeSessionValue('numberOfEpisodes', String(Number.isFinite(data?.numberOfEpisodes) ? data.numberOfEpisodes : 0));
 	} catch (error) {
 		console.error('Error fetching episodes:', error);
 	}
 
-	const storedItems = readSessionJson('episodes', []);
-	writeSessionValue('episodes', JSON.stringify(storedItems));
+	const storedItemsRaw = readSessionJson('episodes', []);
+	const storedItems = Array.isArray(storedItemsRaw) ? storedItemsRaw : [];
 
 	return {
 		items: storedItems,
@@ -140,8 +154,8 @@ const getChannelStats = async () => {
 	const cachedTimestamp = readSessionNumber('channelFetchedAt');
 
 	if (cachedTimestamp && (cachedTimestamp + CACHE_DURATION > Date.now())) {
-		const cachedChannel = readSessionJson('channel', {});
-		writeSessionValue('channel', JSON.stringify(cachedChannel));
+		const cachedChannelRaw = readSessionJson('channel', {});
+		const cachedChannel = cachedChannelRaw && typeof cachedChannelRaw === 'object' ? cachedChannelRaw : {};
 
 		return {
 			channel: cachedChannel,
@@ -150,22 +164,18 @@ const getChannelStats = async () => {
 	}
 
 	try {
-		const response = await fetch('https://tekwill-serverless.orletchi-bogdan2009.workers.dev/channel');
-		if (!response.ok) {
-			throw new Error(`Episodes request failed: ${response.status}`);
-		}
-
-		const data = await response.json();
+		const data = await fetchJsonWithTimeout('https://tekwill-serverless.orletchi-bogdan2009.workers.dev/channel');
 		const fetchedAt = Date.now();
+		const channelInfo = data?.channelInfo && typeof data.channelInfo === 'object' ? data.channelInfo : {};
 
-		writeSessionValue('channel', JSON.stringify(data.channelInfo || {}));
+		writeSessionValue('channel', JSON.stringify(channelInfo));
 		writeSessionValue('channelFetchedAt', fetchedAt.toString());
 	} catch (error) {
 		console.error('Error fetching channel:', error);
 	}
 
-	const storedChannel = readSessionJson('channel', {});
-	writeSessionValue('channel', JSON.stringify(storedChannel));
+	const storedChannelRaw = readSessionJson('channel', {});
+	const storedChannel = storedChannelRaw && typeof storedChannelRaw === 'object' ? storedChannelRaw : {};
 
 	return {
 		channel: storedChannel,
