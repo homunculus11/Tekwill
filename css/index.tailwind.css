@@ -914,3 +914,99 @@ main {
     opacity: 0.24;
   }
 }
+
+/* ── 30-Second Preview Player ── */
+
+.preview-player {
+  @apply fixed inset-0 z-50 flex items-end justify-center pb-6 px-4 opacity-0 pointer-events-none transition-all duration-300;
+  background: rgba(8, 14, 28, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.preview-player.open {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.preview-player-card {
+  @apply w-full max-w-[520px] overflow-hidden border shadow-2xl;
+  border-radius: var(--radius-card);
+  border-color: rgba(139, 161, 194, 0.24);
+  background: linear-gradient(165deg, rgba(24, 36, 59, 0.96) 0%, rgba(16, 25, 42, 0.98) 100%);
+  transform: translateY(24px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.preview-player.open .preview-player-card {
+  transform: translateY(0);
+}
+
+.preview-player-header {
+  @apply flex items-start justify-between gap-3 px-4 pt-4 pb-2;
+}
+
+.preview-player-info {
+  @apply flex flex-col gap-1 min-w-0;
+}
+
+.preview-player-badge {
+  @apply inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary;
+  border-color: rgba(109, 186, 198, 0.5);
+  background: rgba(109, 186, 198, 0.12);
+}
+
+.preview-player-title {
+  @apply m-0 text-sm font-semibold text-white/90 truncate;
+}
+
+.preview-player-close {
+  @apply shrink-0 grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors;
+}
+
+.preview-player-close:hover {
+  @apply bg-white/10 text-white border-white/20;
+}
+
+.preview-player-stage {
+  @apply px-4 pt-2;
+}
+
+.preview-yt-container {
+  @apply w-full aspect-video rounded-lg overflow-hidden bg-black;
+}
+
+.preview-yt-container iframe {
+  @apply w-full h-full;
+  pointer-events: none;
+}
+
+.preview-player-controls {
+  @apply flex items-center gap-3 px-4 py-3;
+}
+
+.preview-play-pause {
+  @apply shrink-0 grid h-9 w-9 place-items-center rounded-full bg-primary text-slate-900 transition-all;
+  box-shadow: 0 6px 16px rgba(88, 199, 214, 0.3);
+}
+
+.preview-play-pause:hover {
+  filter: brightness(1.08);
+  @apply scale-105;
+}
+
+.preview-progress-wrap {
+  @apply flex flex-1 items-center gap-3 min-w-0;
+}
+
+.preview-progress-bar {
+  @apply flex-1 h-[3px] rounded-full overflow-hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.preview-progress-fill {
+  @apply h-full rounded-full w-0 transition-[width] duration-300 ease-linear;
+  background: linear-gradient(90deg, #80c6d0, #a7b6f0);
+}
+
+.preview-timer {
+  @apply shrink-0 text-[11px] font-medium text-white/50 tabular-nums;
+}

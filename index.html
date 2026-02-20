@@ -241,6 +241,36 @@
         </section>
     </main>
 
+    <!-- 30-Second Preview Player -->
+    <div id="preview-player" class="preview-player" aria-hidden="true">
+        <div class="preview-player-card">
+            <div class="preview-player-header">
+                <div class="preview-player-info">
+                    <span class="preview-player-badge">Preview 30s</span>
+                    <p class="preview-player-title" id="preview-player-title">Se încarcă...</p>
+                </div>
+                <button id="preview-player-close" class="preview-player-close" type="button" aria-label="Închide playerul">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="preview-player-stage">
+                <div id="preview-yt-container" class="preview-yt-container"></div>
+            </div>
+            <div class="preview-player-controls">
+                <button id="preview-play-pause" class="preview-play-pause" type="button" aria-label="Play/Pause">
+                    <svg id="preview-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="preview-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="hidden"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+                </button>
+                <div class="preview-progress-wrap">
+                    <div class="preview-progress-bar">
+                        <div id="preview-progress-fill" class="preview-progress-fill"></div>
+                    </div>
+                    <span id="preview-timer" class="preview-timer">0:00 / 0:30</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-top">

@@ -468,6 +468,22 @@ getEpisodes()
 		renderLatestEpisodeCard(data.items);
 		renderRecentGuests(data.items);
 		fillEpisodeCards(data.items);
+
+		// Store latest episode info for the 30s preview player
+		const latestForPreview = data.items?.find(item => {
+			const title = item?.snippet?.title;
+			return typeof title === 'string' && title.trim() && !/trailer/i.test(title);
+		});
+		if (latestForPreview) {
+			const vid = latestForPreview.contentDetails?.videoId
+				|| latestForPreview.snippet?.resourceId?.videoId
+				|| null;
+			if (vid) {
+				previewState.videoId = vid;
+				const titleEl = document.getElementById('preview-player-title');
+				if (titleEl) titleEl.textContent = extractEpisodeTopic(latestForPreview.snippet?.title) || latestForPreview.snippet?.title || 'Episod nou';
+			}
+		}
 	})
 	.catch((error) => {
 		console.error('Error loading episodes:', error);
@@ -655,6 +671,206 @@ const setupReactiveSheen = () => {
 };
 
 setupReactiveSheen();
+
+/* ── 30-Second Preview Player ── */
+
+const previewState = {
+	player: null,
+	isReady: false,
+	isOpen: false,
+	intervalId: null,
+	videoId: null,
+	retryCount: 0
+};
+
+const PREVIEW_DURATION = 30;
+const PREVIEW_MAX_RETRIES = 50;
+
+const ensureYouTubeApi = () => {
+	if (window.YT && window.YT.Player) return;
+	if (document.querySelector('script[src*="youtube.com/iframe_api"]')) return;
+	const tag = document.createElement('script');
+	tag.src = 'https://www.youtube.com/iframe_api';
+	const first = document.getElementsByTagName('script')[0];
+	first.parentNode.insertBefore(tag, first);
+};
+
+const formatPreviewTime = (sec) => {
+	const s = Math.max(0, Math.floor(sec));
+	return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
+
+const updatePreviewUi = () => {
+	const p = previewState.player;
+	if (!p || !previewState.isReady) return;
+
+	const current = Math.min(Number(p.getCurrentTime?.() || 0), PREVIEW_DURATION);
+	const isPlaying = p.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+
+	// Update progress
+	const fill = document.getElementById('preview-progress-fill');
+	if (fill) fill.style.width = `${(current / PREVIEW_DURATION) * 100}%`;
+
+	const timer = document.getElementById('preview-timer');
+	if (timer) timer.textContent = `${formatPreviewTime(current)} / 0:30`;
+
+	// Play/pause icons
+	document.getElementById('preview-icon-play')?.classList.toggle('hidden', isPlaying);
+	document.getElementById('preview-icon-pause')?.classList.toggle('hidden', !isPlaying);
+
+	// Auto-stop at 30 seconds
+	if (current >= PREVIEW_DURATION) {
+		p.pauseVideo?.();
+		p.seekTo?.(0, true);
+		stopPreviewSync();
+		document.getElementById('preview-icon-play')?.classList.remove('hidden');
+		document.getElementById('preview-icon-pause')?.classList.add('hidden');
+	}
+};
+
+const startPreviewSync = () => {
+	stopPreviewSync();
+	previewState.intervalId = setInterval(updatePreviewUi, 250);
+};
+
+const stopPreviewSync = () => {
+	clearInterval(previewState.intervalId);
+	previewState.intervalId = null;
+};
+
+const openPreviewPlayer = (videoId, title) => {
+	if (!videoId) return;
+	previewState.videoId = videoId;
+	previewState.isOpen = true;
+
+	const modal = document.getElementById('preview-player');
+	modal?.classList.add('open');
+	modal?.setAttribute('aria-hidden', 'false');
+	document.body.style.overflow = 'hidden';
+
+	const titleEl = document.getElementById('preview-player-title');
+	if (titleEl) titleEl.textContent = title || 'Episod nou';
+
+	// Reset UI
+	const fill = document.getElementById('preview-progress-fill');
+	if (fill) fill.style.width = '0%';
+	const timer = document.getElementById('preview-timer');
+	if (timer) timer.textContent = '0:00 / 0:30';
+
+	ensureYouTubeApi();
+	loadPreviewVideo(videoId);
+};
+
+const closePreviewPlayer = () => {
+	previewState.isOpen = false;
+	stopPreviewSync();
+
+	if (previewState.player && previewState.isReady) {
+		previewState.player.stopVideo?.();
+	}
+
+	const modal = document.getElementById('preview-player');
+	modal?.classList.remove('open');
+	modal?.setAttribute('aria-hidden', 'true');
+	document.body.style.overflow = '';
+
+	document.getElementById('preview-icon-play')?.classList.remove('hidden');
+	document.getElementById('preview-icon-pause')?.classList.add('hidden');
+};
+
+const loadPreviewVideo = (videoId) => {
+	if (window.YT && window.YT.Player) {
+		previewState.retryCount = 0;
+
+		if (previewState.player) {
+			previewState.isReady = true;
+			previewState.player.cueVideoById({ videoId, startSeconds: 0 });
+			startPreviewSync();
+		} else {
+			previewState.player = new YT.Player('preview-yt-container', {
+				height: '100%',
+				width: '100%',
+				videoId,
+				playerVars: {
+					playsinline: 1,
+					autoplay: 0,
+					controls: 0,
+					disablekb: 1,
+					fs: 0,
+					iv_load_policy: 3,
+					modestbranding: 1,
+					rel: 0,
+					cc_load_policy: 0,
+					start: 0,
+					end: PREVIEW_DURATION
+				},
+				events: {
+					onReady: () => {
+						previewState.isReady = true;
+						startPreviewSync();
+					},
+					onStateChange: (event) => {
+						const state = event?.data;
+						if (state === window.YT?.PlayerState?.PLAYING) {
+							startPreviewSync();
+						}
+						updatePreviewUi();
+					}
+				}
+			});
+		}
+	} else {
+		if (previewState.retryCount >= PREVIEW_MAX_RETRIES) return;
+		previewState.retryCount++;
+		setTimeout(() => loadPreviewVideo(videoId), 100);
+	}
+};
+
+const setupPreviewPlayer = () => {
+	// Close button
+	document.getElementById('preview-player-close')?.addEventListener('click', closePreviewPlayer);
+
+	// Click backdrop to close
+	document.getElementById('preview-player')?.addEventListener('click', (e) => {
+		if (e.target.id === 'preview-player') closePreviewPlayer();
+	});
+
+	// Play/Pause toggle
+	document.getElementById('preview-play-pause')?.addEventListener('click', () => {
+		const p = previewState.player;
+		if (!p || !previewState.isReady) return;
+		const state = p.getPlayerState?.();
+		if (state === window.YT?.PlayerState?.PLAYING) {
+			p.pauseVideo?.();
+		} else {
+			const current = Number(p.getCurrentTime?.() || 0);
+			if (current >= PREVIEW_DURATION) {
+				p.seekTo?.(0, true);
+			}
+			p.playVideo?.();
+		}
+	});
+
+	// Escape key
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && previewState.isOpen) {
+			closePreviewPlayer();
+		}
+	});
+
+	// Wire the "Play 30s" button in the floating card
+	const play30sBtn = document.querySelector('.floating-actions .btn-mini');
+	if (play30sBtn) {
+		play30sBtn.addEventListener('click', () => {
+			if (previewState.videoId) {
+				const title = document.getElementById('preview-player-title')?.textContent;
+				openPreviewPlayer(previewState.videoId, title);
+			}
+		});
+	}
+};
+
+setupPreviewPlayer();
 
 getChannelStats()
 	.then((data) => {
