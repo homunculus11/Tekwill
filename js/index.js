@@ -426,6 +426,22 @@ const renderRecentGuestsSkeleton = (count = 4) => {
 	}
 };
 
+const metricsState = { inView: false, pending: new Map() };
+
+const deferMetricAnimation = (element, value) => {
+	if (!element) return;
+	if (metricsState.inView) {
+		setMetricValue(element, value);
+		return;
+	}
+	if (value === null || value === undefined) {
+		setMetricValue(element, value);
+		return;
+	}
+	element.textContent = '0';
+	metricsState.pending.set(element, value);
+};
+
 const loadingState = {
 	episodes: true,
 	channel: true
@@ -461,8 +477,8 @@ getEpisodes()
 		const episodeCountElement = document.getElementById('nr-of-episodes');
 		const guestCountElement = document.getElementById('nr-of-guests');
 
-		setMetricValue(episodeCountElement, episodeCount);
-		setMetricValue(guestCountElement, guestCount || null);
+		deferMetricAnimation(episodeCountElement, episodeCount);
+		deferMetricAnimation(guestCountElement, guestCount || null);
 
 		renderQuoteCarousel(data.items);
 		renderLatestEpisodeCard(data.items);
@@ -876,7 +892,7 @@ getChannelStats()
 	.then((data) => {
 		const listeners = data.channel?.statistics?.subscriberCount ?? null;
 		const listenersElement = document.getElementById('nr-of-listeners');
-		setMetricValue(listenersElement, listeners);
+		deferMetricAnimation(listenersElement, listeners);
 
 		const floatingBadge = document.querySelector('.floating-badge');
 		if (floatingBadge) {
@@ -896,3 +912,199 @@ getChannelStats()
 		loadingState.channel = false;
 		syncLoadingState();
 	});
+
+/* ── Scroll-Driven Animations ── */
+
+(() => {
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+	// ─── Scroll progress indicator ───
+	const header = document.querySelector('.site-header');
+	if (header) {
+		const bar = document.createElement('div');
+		bar.className = 'scroll-progress';
+		header.appendChild(bar);
+
+		const updateProgress = () => {
+			const scrollTop = window.scrollY;
+			const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+			bar.style.transform = `scaleX(${docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0})`;
+		};
+
+		window.addEventListener('scroll', updateProgress, { passive: true });
+		updateProgress();
+	}
+
+	// ─── Hero parallax + float sync ───
+	if (!prefersReducedMotion) {
+		const heroImage = document.querySelector('.hero-image');
+		const floatingCard = document.querySelector('.floating-card');
+		const floatingBadge = document.querySelector('.floating-badge');
+
+		if (heroImage || floatingCard || floatingBadge) {
+			if (heroImage) heroImage.style.willChange = 'translate';
+			if (floatingCard) floatingCard.style.willChange = 'translate';
+			if (floatingBadge) floatingBadge.style.willChange = 'translate';
+
+			let parallaxTicking = false;
+			window.addEventListener('scroll', () => {
+				if (parallaxTicking) return;
+				parallaxTicking = true;
+				requestAnimationFrame(() => {
+					const y = Math.min(window.scrollY, 800);
+					if (heroImage) heroImage.style.translate = `0 ${y * 0.08}px`;
+					if (floatingCard) floatingCard.style.translate = `0 ${y * -0.06}px`;
+					if (floatingBadge) floatingBadge.style.translate = `${y * 0.04}px ${y * -0.1}px`;
+					parallaxTicking = false;
+				});
+			}, { passive: true });
+		}
+	}
+
+	// ─── Quote carousel reveal ───
+	const carousel = document.querySelector('.quote-carousel');
+	if (carousel && !prefersReducedMotion) {
+		carousel.setAttribute('data-scroll-reveal', '');
+		new IntersectionObserver((entries, obs) => {
+			if (entries[0]?.isIntersecting) {
+				carousel.classList.add('revealed');
+				obs.disconnect();
+			}
+		}, { threshold: 0.4 }).observe(carousel);
+	}
+
+	// ─── Metrics count-up + glow burst ───
+	const metricsSection = document.querySelector('.hero-metrics');
+	if (metricsSection) {
+		new IntersectionObserver((entries, obs) => {
+			if (entries[0]?.isIntersecting) {
+				metricsState.inView = true;
+				for (const [el, val] of metricsState.pending) {
+					setMetricValue(el, val);
+				}
+				metricsState.pending.clear();
+
+				if (!prefersReducedMotion) {
+					document.querySelectorAll('.metric-card').forEach((card, i) => {
+						setTimeout(() => card.classList.add('glow-active'), 200 + i * 200);
+					});
+				}
+				obs.disconnect();
+			}
+		}, { threshold: 0.3 }).observe(metricsSection);
+	}
+
+	// ─── Episode card reveals ───
+	const episodeCards = document.querySelectorAll('.episode-card');
+	if (episodeCards.length && !prefersReducedMotion) {
+		episodeCards.forEach(c => c.setAttribute('data-scroll-reveal', ''));
+		const episodeObs = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					const idx = [...episodeCards].indexOf(entry.target);
+					setTimeout(() => entry.target.classList.add('revealed'), idx * 120);
+					episodeObs.unobserve(entry.target);
+				}
+			}
+		}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+		episodeCards.forEach(c => episodeObs.observe(c));
+	}
+
+	// ─── Section title underline draw ───
+	const sectionTitles = document.querySelectorAll('.section-title');
+	if (sectionTitles.length) {
+		if (prefersReducedMotion) {
+			sectionTitles.forEach(t => t.classList.add('underline-drawn'));
+		} else {
+			const titleObs = new IntersectionObserver((entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('underline-drawn');
+						titleObs.unobserve(entry.target);
+					}
+				}
+			}, { threshold: 0.5 });
+			sectionTitles.forEach(t => titleObs.observe(t));
+		}
+	}
+
+	// ─── Guest cards cascade (from sides with 3D) ───
+	const guestsGrid = document.getElementById('recent-guests-grid');
+	if (guestsGrid && !prefersReducedMotion) {
+		const revealGuests = () => {
+			const cards = guestsGrid.querySelectorAll('.guest-card:not(.guest-card-skeleton)');
+			if (!cards.length) return;
+			cards.forEach(c => c.setAttribute('data-scroll-reveal', ''));
+
+			new IntersectionObserver((entries, obs) => {
+				if (entries[0]?.isIntersecting) {
+					cards.forEach((c, i) => setTimeout(() => c.classList.add('revealed'), i * 80));
+					obs.disconnect();
+				}
+			}, { threshold: 0.15 }).observe(guestsGrid);
+		};
+
+		new MutationObserver((_, obs) => {
+			if (guestsGrid.querySelector('.guest-card:not(.guest-card-skeleton)')) {
+				obs.disconnect();
+				requestAnimationFrame(revealGuests);
+			}
+		}).observe(guestsGrid, { childList: true });
+	}
+
+	// ─── Listen cards spotlight sheen ───
+	const listenCards = document.querySelectorAll('.listen-card');
+	if (listenCards.length && !prefersReducedMotion) {
+		listenCards.forEach(c => c.setAttribute('data-scroll-reveal', ''));
+		const listenObs = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) {
+					setTimeout(() => entry.target.classList.add('sheen-active'), 150);
+					listenObs.unobserve(entry.target);
+				}
+			}
+		}, { threshold: 0.3 });
+		listenCards.forEach(c => listenObs.observe(c));
+	}
+
+	// ─── Final CTA snap focus ───
+	const ctaCard = document.querySelector('.final-cta-card');
+	if (ctaCard && !prefersReducedMotion) {
+		new IntersectionObserver((entries) => {
+			ctaCard.classList.toggle('snap-focus', entries[0]?.isIntersecting);
+		}, { threshold: 0.5 }).observe(ctaCard);
+	}
+
+	// ─── Magnetic 3D Tilt + Spotlight on Cards ───
+	if (!prefersReducedMotion && hasFinePointer) {
+		const tiltTargets = document.querySelectorAll('.episode-card, .listen-card, .metric-card');
+
+		tiltTargets.forEach(card => {
+			card.classList.add('tilt-card');
+
+			const spotlight = document.createElement('div');
+			spotlight.className = 'card-spotlight';
+			card.appendChild(spotlight);
+
+			card.addEventListener('mousemove', (e) => {
+				const rect = card.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+				const cx = rect.width / 2;
+				const cy = rect.height / 2;
+
+				const rotateX = ((y - cy) / cy) * -5;
+				const rotateY = ((x - cx) / cx) * 5;
+
+				card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+				spotlight.style.setProperty('--spot-x', `${x}px`);
+				spotlight.style.setProperty('--spot-y', `${y}px`);
+			}, { passive: true });
+
+			card.addEventListener('mouseleave', () => {
+				card.style.transform = '';
+			});
+		});
+	}
+})();

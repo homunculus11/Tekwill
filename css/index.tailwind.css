@@ -915,6 +915,177 @@ main {
   }
 }
 
+/* ── Scroll Animations ── */
+
+.scroll-progress {
+  position: absolute;
+  bottom: 2px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, #80c6d0, #a7b6f0);
+  transform-origin: left;
+  transform: scaleX(0);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Card Reveals ── */
+
+@keyframes scroll-reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 var(--reveal-y, 32px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.episode-card[data-scroll-reveal] {
+  --reveal-y: 36px;
+  opacity: 0;
+}
+
+.episode-card[data-scroll-reveal].revealed {
+  animation: scroll-reveal-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.quote-carousel[data-scroll-reveal] {
+  --reveal-y: 18px;
+  opacity: 0;
+}
+
+.quote-carousel[data-scroll-reveal].revealed {
+  animation: scroll-reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.guest-card[data-scroll-reveal] {
+  --reveal-y: 28px;
+  opacity: 0;
+}
+
+.guest-card[data-scroll-reveal].revealed {
+  animation: scroll-reveal-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Magnetic 3D Tilt + Spotlight ── */
+
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-spotlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  background: radial-gradient(
+    350px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(142, 208, 217, 0.15),
+    transparent 60%
+  );
+  transition: opacity 0.35s ease;
+}
+
+.tilt-card:hover .card-spotlight {
+  opacity: 1;
+}
+
+/* ── Section Title Underline Draw ── */
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 20px;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #80c6d0, #a7b6f0 60%, transparent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section-title.underline-drawn::after {
+  transform: scaleX(1);
+}
+
+/* ── Listen Card Sheen ── */
+
+.listen-card[data-scroll-reveal]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, rgba(142, 208, 217, 0.06) 46%, rgba(167, 182, 240, 0.04) 50%, transparent 54%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  transition: none;
+}
+
+.listen-card[data-scroll-reveal].sheen-active::after {
+  background-position: -100% 0;
+  transition: background-position 0.8s ease;
+}
+
+/* ── Metric Glow Burst ── */
+
+@keyframes metric-glow-burst {
+  0%, 100% {
+    box-shadow: 0 14px 32px rgba(4, 10, 20, 0.34);
+  }
+  40% {
+    box-shadow:
+      0 14px 32px rgba(4, 10, 20, 0.34),
+      0 0 60px rgba(109, 186, 198, 0.24),
+      inset 0 0 30px rgba(109, 186, 198, 0.05);
+  }
+}
+
+.metric-card.glow-active {
+  animation: metric-glow-burst 1.4s ease forwards;
+}
+
+/* ── Final CTA Snap ── */
+
+.final-cta-card {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease;
+}
+
+.final-cta-card.snap-focus {
+  transform: scale(1.006);
+  box-shadow: 0 22px 48px rgba(4, 10, 20, 0.42);
+}
+
+@media (max-width: 640px) {
+  .section-title::after {
+    left: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-title::after {
+    transition: none;
+    transform: scaleX(1);
+  }
+
+  .episode-card[data-scroll-reveal],
+  .guest-card[data-scroll-reveal],
+  .quote-carousel[data-scroll-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
 /* ── 30-Second Preview Player ── */
 
 .preview-player {
