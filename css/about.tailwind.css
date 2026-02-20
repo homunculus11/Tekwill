@@ -260,7 +260,7 @@ h4 {
 
 .timeline-step::before {
 	content: '';
-	@apply absolute -left-[36px] top-7 h-4 w-4 rounded-full border border-white/20 bg-[#172645] transition-all duration-300;
+	@apply absolute -left-[34px] top-7 h-4 w-4 rounded-full border border-white/20 bg-[#172645] transition-all duration-300;
 }
 
 .timeline-step.is-active {
@@ -442,7 +442,7 @@ h4 {
 	}
 
 	.timeline-step::before {
-		@apply -left-[30px];
+		@apply -left-[28px];
 	}
 }
 
