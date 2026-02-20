@@ -184,6 +184,25 @@
                             </button>
                         </div>
 
+                        <section class="episode-comments" aria-label="Comentarii episod">
+                            <div class="comments-head">
+                                <h3 class="comments-title">Comentarii</h3>
+                                <span id="comments-count" class="comments-count">0</span>
+                            </div>
+
+                            <div id="comments-status" class="comments-status" role="status" aria-live="polite">Se încarcă comentariile...</div>
+                            <ul id="comments-list" class="comments-list" aria-live="polite"></ul>
+
+                            <form id="comment-form" class="comment-form" novalidate>
+                                <label for="comment-input" class="comment-label">Adaugă un comentariu</label>
+                                <textarea id="comment-input" class="comment-input" maxlength="500" placeholder="Scrie un comentariu (max 500 caractere)..." required></textarea>
+                                <div class="comment-form-row">
+                                    <span id="comment-auth-note" class="comment-auth-note">Trebuie să fii autentificat pentru a comenta.</span>
+                                    <button id="comment-submit" type="submit" class="comment-submit">Comentează</button>
+                                </div>
+                            </form>
+                        </section>
+
                     </div>
                 </div>
             </div>

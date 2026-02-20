@@ -1,3 +1,7 @@
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
 // State
 let episodes = [];
 let originalEpisodes = []; // Store original fetch for sorting
@@ -15,6 +19,12 @@ let playerState = {
     mode: 'video', // 'video' | 'audio'
     currentEpisode: null
 };
+
+let currentAuthUser = null;
+let activeCommentsRequestId = 0;
+let isSubmittingComment = false;
+let isCommentActionPending = false;
+const commentsById = new Map();
 
 let lastFocusedElement = null;
 
@@ -511,6 +521,8 @@ let youtubeApiRetryCount = 0;
 const MAX_YOUTUBE_API_RETRIES = 50;
 
 const PLAYBACK_MEMORY_KEY = 'episodePlaybackPositions';
+const COMMENTS_COLLECTION = 'episodeComments';
+const COMMENT_MAX_LENGTH = 500;
 const DEFAULT_QUALITY = 'hd1080';
 const QUALITY_PRIORITY = ['highres', 'hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny'];
 
@@ -558,6 +570,330 @@ const formatEpisodeDescription = (text) => {
     if (!compact) return 'Descriere indisponibilă momentan.';
 
     return compact.length > 320 ? `${compact.slice(0, 320).trim()}...` : compact;
+};
+
+const getLoginRoute = () => {
+    const normalizedPath = window.location.pathname.replaceAll('\\', '/');
+    return normalizedPath.includes('/src/') ? './login.html' : './src/login.html';
+};
+
+const getCommentDisplayName = (user) => {
+    const fromProfile = typeof user?.displayName === 'string' ? user.displayName.trim() : '';
+    if (fromProfile) return fromProfile;
+
+    const email = typeof user?.email === 'string' ? user.email.trim() : '';
+    if (email) {
+        return email.split('@')[0] || 'Utilizator';
+    }
+
+    return 'Utilizator';
+};
+
+const formatCommentTimestamp = (value) => {
+    const dateValue = value?.toDate?.() || (value instanceof Date ? value : null);
+    if (!dateValue) return 'Acum câteva momente';
+
+    try {
+        return new Intl.DateTimeFormat('ro-RO', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(dateValue);
+    } catch {
+        return 'Acum câteva momente';
+    }
+};
+
+const canManageComment = (comment) => {
+    const uid = currentAuthUser?.uid;
+    return Boolean(uid && comment?.authorUid === uid);
+};
+
+const getCommentsElements = () => ({
+    list: document.getElementById('comments-list'),
+    status: document.getElementById('comments-status'),
+    count: document.getElementById('comments-count'),
+    form: document.getElementById('comment-form'),
+    input: document.getElementById('comment-input'),
+    submit: document.getElementById('comment-submit'),
+    authNote: document.getElementById('comment-auth-note')
+});
+
+const setCommentsStatus = (message = '') => {
+    const { status } = getCommentsElements();
+    if (!status) return;
+
+    status.textContent = message;
+    status.classList.toggle('hidden', !message);
+};
+
+const updateCommentFormState = () => {
+    const { input, submit, authNote } = getCommentsElements();
+    const isSignedIn = Boolean(currentAuthUser);
+
+    if (input) {
+        input.disabled = !isSignedIn;
+        input.placeholder = isSignedIn
+            ? 'Scrie un comentariu (max 500 caractere)...'
+            : 'Autentifică-te pentru a adăuga un comentariu.';
+    }
+
+    if (submit) {
+        submit.disabled = !isSignedIn || isSubmittingComment;
+        submit.textContent = isSubmittingComment ? 'Se trimite...' : 'Comentează';
+    }
+
+    if (authNote) {
+        if (isSignedIn) {
+            const safeName = escapeHtml(getCommentDisplayName(currentAuthUser));
+            authNote.innerHTML = `Comentezi ca <strong class="text-white/80">${safeName}</strong>`;
+            return;
+        }
+
+        authNote.innerHTML = `Trebuie să fii autentificat pentru a comenta. <a href="${getLoginRoute()}" class="text-primary hover:underline">Login</a>`;
+    }
+};
+
+const renderComments = (comments = []) => {
+    const { list, count } = getCommentsElements();
+    if (!list || !count) return;
+
+    commentsById.clear();
+    comments.forEach((comment) => {
+        if (comment?.id) {
+            commentsById.set(comment.id, comment);
+        }
+    });
+
+    count.textContent = String(comments.length);
+
+    if (!comments.length) {
+        list.innerHTML = '';
+        setCommentsStatus('Nu există comentarii încă. Fii primul care comentează.');
+        return;
+    }
+
+    setCommentsStatus('');
+
+    list.innerHTML = comments.map((comment) => {
+        const safeAuthor = escapeHtml(comment.authorName || 'Utilizator');
+        const safeBody = escapeHtml(comment.body || '').replaceAll('\n', '<br>');
+        const safeTime = escapeHtml(formatCommentTimestamp(comment.createdAt));
+        const safeCommentId = escapeHtml(comment.id || '');
+        const controls = canManageComment(comment)
+            ? `
+                <div class="comment-item-actions">
+                    <button type="button" class="comment-action-btn" data-comment-action="edit" data-comment-id="${safeCommentId}">Editează</button>
+                    <button type="button" class="comment-action-btn comment-action-btn-danger" data-comment-action="delete" data-comment-id="${safeCommentId}">Șterge</button>
+                </div>
+            `
+            : '';
+
+        return `
+            <li class="comment-item">
+                <div class="comment-item-head">
+                    <div class="comment-item-meta">
+                        <span class="comment-author">${safeAuthor}</span>
+                        <time class="comment-time">${safeTime}</time>
+                    </div>
+                    ${controls}
+                </div>
+                <p class="comment-body">${safeBody}</p>
+            </li>
+        `;
+    }).join('');
+};
+
+const loadEpisodeComments = async (episodeId) => {
+    const { list, count } = getCommentsElements();
+    if (!episodeId || !list || !count) return;
+
+    const requestId = ++activeCommentsRequestId;
+    list.innerHTML = '';
+    count.textContent = '0';
+    setCommentsStatus('Se încarcă comentariile...');
+
+    try {
+        const commentsRef = collection(db, COMMENTS_COLLECTION, episodeId, 'items');
+        const commentsQuery = query(commentsRef, orderBy('createdAt', 'desc'), limit(50));
+        const snapshot = await getDocs(commentsQuery);
+
+        if (requestId !== activeCommentsRequestId) return;
+
+        const comments = snapshot.docs.map((docSnap) => {
+            const data = docSnap.data() || {};
+            return {
+                id: docSnap.id,
+                authorName: data.authorName || 'Utilizator',
+                authorUid: typeof data.authorUid === 'string' ? data.authorUid : '',
+                body: typeof data.body === 'string' ? data.body : '',
+                createdAt: data.createdAt || null
+            };
+        }).filter((item) => item.body.trim());
+
+        renderComments(comments);
+    } catch (error) {
+        console.error('Failed to load comments', error);
+        if (requestId !== activeCommentsRequestId) return;
+        setCommentsStatus('Nu am putut încărca comentariile. Încearcă din nou.');
+    }
+};
+
+const handleCommentSubmit = async (event) => {
+    event.preventDefault();
+
+    const episodeId = playerState.currentEpisode?.videoId;
+    const { input } = getCommentsElements();
+    if (!episodeId || !input || isSubmittingComment) return;
+
+    if (!currentAuthUser) {
+        updateCommentFormState();
+        return;
+    }
+
+    const body = String(input.value || '').trim();
+    if (!body) {
+        setCommentsStatus('Comentariul nu poate fi gol.');
+        return;
+    }
+
+    if (body.length > COMMENT_MAX_LENGTH) {
+        setCommentsStatus(`Comentariul poate avea maxim ${COMMENT_MAX_LENGTH} caractere.`);
+        return;
+    }
+
+    isSubmittingComment = true;
+    updateCommentFormState();
+    setCommentsStatus('Se publică comentariul...');
+
+    try {
+        const commentsRef = collection(db, COMMENTS_COLLECTION, episodeId, 'items');
+        await addDoc(commentsRef, {
+            body,
+            authorUid: currentAuthUser.uid,
+            authorName: getCommentDisplayName(currentAuthUser),
+            authorEmail: currentAuthUser.email || '',
+            createdAt: serverTimestamp()
+        });
+
+        input.value = '';
+        await loadEpisodeComments(episodeId);
+        setCommentsStatus('Comentariul a fost publicat.');
+    } catch (error) {
+        console.error('Failed to post comment', error);
+        setCommentsStatus('Nu am putut publica comentariul. Verifică autentificarea și încearcă din nou.');
+    } finally {
+        isSubmittingComment = false;
+        updateCommentFormState();
+    }
+};
+
+const setCommentActionButtonsDisabled = (isDisabled) => {
+    const { list } = getCommentsElements();
+    if (!list) return;
+
+    list.querySelectorAll('.comment-action-btn').forEach((button) => {
+        button.disabled = isDisabled;
+    });
+};
+
+const handleCommentActions = async (event) => {
+    const actionButton = event.target?.closest?.('[data-comment-action]');
+    if (!actionButton || isCommentActionPending) return;
+
+    const episodeId = playerState.currentEpisode?.videoId;
+    const commentId = actionButton.getAttribute('data-comment-id') || '';
+    const action = actionButton.getAttribute('data-comment-action') || '';
+    const comment = commentsById.get(commentId);
+
+    if (!episodeId || !comment || !commentId) return;
+    if (!canManageComment(comment)) {
+        setCommentsStatus('Poți edita sau șterge doar comentariile tale.');
+        return;
+    }
+
+    const commentRef = doc(db, COMMENTS_COLLECTION, episodeId, 'items', commentId);
+
+    if (action === 'delete') {
+        const shouldDelete = window.confirm('Vrei să ștergi acest comentariu?');
+        if (!shouldDelete) return;
+
+        isCommentActionPending = true;
+        setCommentActionButtonsDisabled(true);
+        setCommentsStatus('Se șterge comentariul...');
+
+        try {
+            await deleteDoc(commentRef);
+            await loadEpisodeComments(episodeId);
+            setCommentsStatus('Comentariul a fost șters.');
+        } catch (error) {
+            console.error('Failed to delete comment', error);
+            setCommentsStatus('Nu am putut șterge comentariul. Încearcă din nou.');
+        } finally {
+            isCommentActionPending = false;
+            setCommentActionButtonsDisabled(false);
+        }
+
+        return;
+    }
+
+    if (action === 'edit') {
+        const draft = window.prompt('Editează comentariul:', comment.body || '');
+        if (draft === null) return;
+
+        const nextBody = String(draft).trim();
+        if (!nextBody) {
+            setCommentsStatus('Comentariul nu poate fi gol.');
+            return;
+        }
+
+        if (nextBody.length > COMMENT_MAX_LENGTH) {
+            setCommentsStatus(`Comentariul poate avea maxim ${COMMENT_MAX_LENGTH} caractere.`);
+            return;
+        }
+
+        if (nextBody === (comment.body || '').trim()) {
+            setCommentsStatus('Nu există modificări de salvat.');
+            return;
+        }
+
+        isCommentActionPending = true;
+        setCommentActionButtonsDisabled(true);
+        setCommentsStatus('Se actualizează comentariul...');
+
+        try {
+            await updateDoc(commentRef, { body: nextBody });
+            await loadEpisodeComments(episodeId);
+            setCommentsStatus('Comentariul a fost actualizat.');
+        } catch (error) {
+            console.error('Failed to update comment', error);
+            setCommentsStatus('Nu am putut actualiza comentariul. Încearcă din nou.');
+        } finally {
+            isCommentActionPending = false;
+            setCommentActionButtonsDisabled(false);
+        }
+    }
+};
+
+const setupComments = () => {
+    const { form, list } = getCommentsElements();
+    if (!form || !list) return;
+
+    form.addEventListener('submit', handleCommentSubmit);
+    list.addEventListener('click', handleCommentActions);
+    onAuthStateChanged(auth, (user) => {
+        currentAuthUser = user || null;
+        updateCommentFormState();
+
+        const episodeId = playerState.currentEpisode?.videoId;
+        if (episodeId) {
+            loadEpisodeComments(episodeId);
+        }
+    });
+
+    updateCommentFormState();
 };
 
 const updateRangeProgress = (rangeInput, activeColor = 'rgba(88, 199, 214, 1)', trackColor = 'rgba(255, 255, 255, 0.22)') => {
@@ -906,6 +1242,7 @@ const setupPlayer = () => {
     document.getElementById('mode-video')?.addEventListener('click', () => setPlayerMode('video'));
     document.getElementById('mode-audio')?.addEventListener('click', () => setPlayerMode('audio'));
     setupPlayerControls();
+    setupComments();
 
     // Keyboard 'Escape'
     document.addEventListener('keydown', (e) => {
@@ -1008,6 +1345,8 @@ const openPlayer = (episode) => {
     // Update URL hash without reload
     history.replaceState(null, '', `#${encodeURIComponent(episode.videoId)}`);
 
+    loadEpisodeComments(episode.videoId);
+
     loadYoutubeVideo(episode.videoId);
 };
 
@@ -1033,6 +1372,13 @@ const closePlayer = () => {
     seekHoldTargetSeconds = null;
     optimisticTimelineSeconds = null;
     optimisticTimelineLastTick = 0;
+    activeCommentsRequestId += 1;
+    commentsById.clear();
+
+    const { list, count } = getCommentsElements();
+    if (list) list.innerHTML = '';
+    if (count) count.textContent = '0';
+    setCommentsStatus('');
 
     // Stop Video
     if (youtubePlayer && youtubePlayer.stopVideo) {

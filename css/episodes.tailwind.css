@@ -377,3 +377,104 @@ body.player-open {
 #mode-audio {
     @apply transition-all duration-200;
 }
+
+.episode-comments {
+    @apply mt-1 rounded-2xl border border-white/10 bg-black/20 p-4;
+}
+
+.comments-head {
+    @apply flex items-center justify-between mb-3;
+}
+
+.comments-title {
+    @apply text-sm font-semibold text-white;
+}
+
+.comments-count {
+    @apply text-xs font-semibold text-primary bg-primary-soft border border-primary-soft rounded-full px-2 py-0.5;
+}
+
+.comments-status {
+    @apply text-xs text-white/60 mb-2;
+}
+
+.comments-list {
+    @apply space-y-2 max-h-56 overflow-y-auto pr-1;
+}
+
+.comment-item {
+    @apply rounded-xl border border-white/10 bg-white/5 p-3;
+}
+
+.comment-item-head {
+    @apply flex items-center justify-between gap-2 mb-1;
+}
+
+.comment-item-meta {
+    @apply min-w-0;
+}
+
+.comment-item-actions {
+    @apply flex items-center gap-1.5;
+}
+
+.comment-action-btn {
+    @apply px-2 py-1 rounded-md text-[11px] font-semibold border border-white/10 bg-white/5 text-white/80 transition-all;
+}
+
+.comment-action-btn:hover {
+    @apply text-white bg-white/10 border-white/20;
+}
+
+.comment-action-btn:disabled {
+    @apply opacity-60 cursor-not-allowed;
+}
+
+.comment-action-btn-danger {
+    @apply text-red-200 border-red-400/30 bg-red-500/10;
+}
+
+.comment-action-btn-danger:hover {
+    @apply text-red-100 border-red-300/40 bg-red-500/20;
+}
+
+.comment-author {
+    @apply text-xs font-semibold text-white;
+}
+
+.comment-time {
+    @apply text-[11px] text-white/50;
+}
+
+.comment-body {
+    @apply text-sm text-white/80 leading-relaxed break-words;
+}
+
+.comment-form {
+    @apply mt-3 space-y-2;
+}
+
+.comment-label {
+    @apply block text-xs font-medium text-white/70;
+}
+
+.comment-input {
+    @apply w-full min-h-[88px] rounded-xl border border-white/10 bg-white/5 text-sm text-white px-3 py-2 placeholder:text-white/40 focus:outline-none focus:border-primary;
+    resize: vertical;
+}
+
+.comment-form-row {
+    @apply flex items-center justify-between gap-3;
+}
+
+.comment-auth-note {
+    @apply text-[11px] text-white/50;
+}
+
+.comment-submit {
+    @apply px-3 py-1.5 rounded-lg bg-primary text-slate-900 text-xs font-semibold transition-all;
+}
+
+.comment-submit:disabled {
+    @apply opacity-60 cursor-not-allowed;
+}
