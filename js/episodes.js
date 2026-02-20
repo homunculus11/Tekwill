@@ -54,7 +54,43 @@ const formatDate = (dateString) => {
     }
 };
 
+const SKELETON_COUNT = 5;
+
+const renderSkeletonCards = () => {
+    horizontalTrack = document.getElementById('horizontal-track');
+    if (!horizontalTrack) return;
+
+    horizontalTrack.innerHTML = '';
+
+    const connector = document.createElement('div');
+    connector.className = 'episodes-track-progress';
+    connector.innerHTML = `
+        <div class="episodes-track-progress-line"></div>
+        <div id="timeline-fill-track" class="episodes-track-progress-fill"></div>
+    `;
+    horizontalTrack.appendChild(connector);
+
+    for (let i = 0; i < SKELETON_COUNT; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-card';
+        skeleton.setAttribute('aria-hidden', 'true');
+        skeleton.innerHTML = `
+            <div class="skeleton-card-image skeleton-shimmer"></div>
+            <div class="skeleton-card-content">
+                <div class="skeleton-badge skeleton-shimmer"></div>
+                <div class="skeleton-title skeleton-shimmer"></div>
+                <div class="skeleton-meta skeleton-shimmer"></div>
+            </div>
+        `;
+        horizontalTrack.appendChild(skeleton);
+    }
+};
+
 const init = async () => {
+    // 0. Show skeleton cards immediately
+    renderSkeletonCards();
+    setupScroll();
+
     // 1. Fetch Episodes
     try {
         if (typeof getEpisodes === 'function') {
@@ -92,11 +128,11 @@ const init = async () => {
         episodes = [...originalEpisodes];
     }
 
-    // 2. Render Cards
+    // 2. Render Cards (replaces skeletons)
     renderCards();
     
-    // 3. Setup Scroll Logic
-    setupScroll();
+    // 3. Setup Scroll Logic (re-calibrate with real cards)
+    updateScroll();
 
     // 4. Setup Player
     setupPlayer();
@@ -206,9 +242,11 @@ const renderCards = () => {
         // Add more top padding inside card or track to center it better?
         // The track has pt-20 now.
         
+        card.dataset.revealDelay = Math.min(index, 7);
+
         card.innerHTML = `
             <div class="card-image-wrapper">
-                <img src="${safeImageUrl}" alt="${safeTitle}" class="card-image" loading="lazy" referrerpolicy="no-referrer">
+                <img src="${safeImageUrl}" alt="${safeTitle}" class="card-image" loading="lazy" referrerpolicy="no-referrer" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')">
                 <div class="card-content">
                     <span class="episode-number">Episodul ${displayNum}</span>
                     <h3 class="episode-title">${safeTitle}</h3>
@@ -257,10 +295,14 @@ const setupScroll = () => {
     
     if (!scrollContainer) return;
 
+    let resizeRaf = 0;
     window.addEventListener('resize', () => {
-        windowHeight = window.innerHeight;
-        updateTrackProgressGeometry();
-        updateScroll();
+        cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(() => {
+            windowHeight = window.innerHeight;
+            updateTrackProgressGeometry();
+            updateScroll();
+        });
     }, { passive: true });
 
     // Throttled scroll handling for performance
@@ -672,6 +714,23 @@ const updateCommentFormState = () => {
     }
 };
 
+const renderCommentSkeletons = (count = 3) => {
+    const { list } = getCommentsElements();
+    if (!list) return;
+
+    list.innerHTML = Array.from({ length: count }, () => `
+        <li class="skeleton-comment" aria-hidden="true">
+            <div class="skeleton-comment-head">
+                <div class="skeleton-comment-avatar skeleton-shimmer"></div>
+                <div class="skeleton-comment-name skeleton-shimmer"></div>
+                <div class="skeleton-comment-time skeleton-shimmer"></div>
+            </div>
+            <div class="skeleton-comment-body skeleton-shimmer"></div>
+            <div class="skeleton-comment-body-short skeleton-shimmer"></div>
+        </li>
+    `).join('');
+};
+
 const renderComments = (comments = []) => {
     const { list, count } = getCommentsElements();
     if (!list || !count) return;
@@ -727,9 +786,9 @@ const loadEpisodeComments = async (episodeId) => {
     if (!episodeId || !list || !count) return;
 
     const requestId = ++activeCommentsRequestId;
-    list.innerHTML = '';
     count.textContent = '0';
-    setCommentsStatus('Se încarcă comentariile...');
+    setCommentsStatus('');
+    renderCommentSkeletons(3);
 
     try {
         const commentsRef = collection(db, COMMENTS_COLLECTION, episodeId, 'items');

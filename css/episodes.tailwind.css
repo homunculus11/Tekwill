@@ -495,3 +495,148 @@ body.player-open {
 .comment-body {
     @apply text-[13px] text-white/70 leading-relaxed break-words;
 }
+
+/* ─── Keyframes ─── */
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes cardReveal {
+    0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Skeleton Loading ─── */
+
+.skeleton-card {
+    @apply relative flex-shrink-0 w-[92vw] md:w-[85vw] lg:w-[78vw] aspect-video
+           bg-bg-card border border-border rounded-3xl overflow-hidden;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.04) 60%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-card-image {
+    @apply absolute inset-0 bg-white/[0.03];
+}
+
+.skeleton-card-content {
+    @apply absolute bottom-0 left-0 w-full p-8 md:p-12;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.skeleton-badge {
+    @apply w-28 h-7 rounded-full bg-white/[0.06] mb-3;
+}
+
+.skeleton-title {
+    @apply h-10 md:h-14 w-3/4 rounded-xl bg-white/[0.06] mb-4;
+}
+
+.skeleton-meta {
+    @apply h-5 w-40 rounded-lg bg-white/[0.04] mt-4;
+}
+
+/* Comment Skeletons */
+.skeleton-comment {
+    @apply rounded-lg bg-white/[0.04] p-3;
+}
+
+.skeleton-comment-head {
+    @apply flex items-center gap-2 mb-2;
+}
+
+.skeleton-comment-avatar {
+    @apply w-6 h-6 rounded-full bg-white/[0.06];
+}
+
+.skeleton-comment-name {
+    @apply w-20 h-3 rounded bg-white/[0.06];
+}
+
+.skeleton-comment-time {
+    @apply w-16 h-2.5 rounded bg-white/[0.04] ml-auto;
+}
+
+.skeleton-comment-body {
+    @apply h-3 rounded bg-white/[0.04];
+}
+
+.skeleton-comment-body-short {
+    @apply h-3 w-2/3 rounded bg-white/[0.04] mt-1.5;
+}
+
+/* ─── Card Reveal Animation ─── */
+
+.episode-card {
+    opacity: 0;
+    animation: cardReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.episode-card[data-reveal-delay="0"] { animation-delay: 0s; }
+.episode-card[data-reveal-delay="1"] { animation-delay: 0.08s; }
+.episode-card[data-reveal-delay="2"] { animation-delay: 0.16s; }
+.episode-card[data-reveal-delay="3"] { animation-delay: 0.24s; }
+.episode-card[data-reveal-delay="4"] { animation-delay: 0.32s; }
+.episode-card[data-reveal-delay="5"] { animation-delay: 0.40s; }
+.episode-card[data-reveal-delay="6"] { animation-delay: 0.48s; }
+.episode-card[data-reveal-delay="7"] { animation-delay: 0.56s; }
+
+/* ─── Image Fade-In on Load ─── */
+
+.card-image {
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.7s ease;
+}
+
+.card-image.loaded {
+    opacity: 1;
+}
+
+/* ─── Improved Player Modal Transitions ─── */
+
+#player-modal {
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                backdrop-filter 0.4s ease;
+}
+
+#player-shell {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.4s ease;
+}
+
+#player-modal.modal-open #player-shell {
+    animation: cardReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Smoother Card Hover ─── */
+
+.episode-card {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.3s ease,
+                box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    contain: layout style paint;
+}
+
+/* ─── Progress Bar Smoothing ─── */
+
+#timeline-fill-bottom {
+    transition: width 0.15s linear;
+}
+
+.episodes-track-progress-fill {
+    transition: width 0.15s linear;
+}
