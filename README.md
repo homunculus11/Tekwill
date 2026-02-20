@@ -66,6 +66,23 @@ The site artifact includes:
 When hosted at `https://<user>.github.io/<repo>/`, root-absolute links like `/login` break.
 Use repository-safe relative/hash links in HTML (already applied in `index.html`).
 
+## Firebase Auth production checklist
+
+For Google Sign-In to work in production (and localhost), configure Firebase before deploy:
+
+1. Open **Firebase Console → Authentication → Sign-in method**
+2. Enable **Google** provider
+3. Open **Firebase Console → Authentication → Settings → Authorized domains**
+4. Add every domain where the app runs, for example:
+   - `localhost`
+   - `<your-user>.github.io`
+   - any custom production domain
+
+Important:
+
+- Do not run auth pages from `file://`; use a web server (`http://localhost:...` or deployed HTTPS domain).
+- If Google popup is blocked by browser policies, the app automatically falls back to redirect login.
+
 ## Project structure
 
 - `index.html` – main landing page
