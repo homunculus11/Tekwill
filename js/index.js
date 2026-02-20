@@ -489,7 +489,12 @@ getEpisodes()
 
 
 const redirectToEpisode = (episodeId) => {
-	window.location.href = `episodes.html/${episodeId}`;
+	if (!episodeId) {
+		window.location.href = './src/episodes.html';
+		return;
+	}
+
+	window.location.href = `./src/episodes.html#${encodeURIComponent(episodeId)}`;
 };
 
 const fillEpisodeCards = async (data) => {

@@ -98,14 +98,14 @@
         </div>
 
         <!-- Player Modal -->
-        <div id="player-modal" class="fixed inset-0 z-50 flex items-start justify-center pt-28 pb-6 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
-            <button id="close-player" class="absolute top-6 right-6 z-50 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center pb-3 px-3 pt-28 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
             
-            <div id="player-shell" class="relative w-[95vw] h-[82vh] max-w-7xl bg-bg-card border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
+            <div id="player-shell" class="relative w-[98vw] h-full max-h-[calc(100vh-9rem)] max-w-[1800px] bg-bg-card border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
+                <button id="close-player" class="absolute top-3 right-3 z-50 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
                 <!-- Video Section -->
-                <div id="player-stage" class="w-full lg:w-[70%] bg-black relative flex items-center justify-center">
+                <div id="player-stage" class="w-full lg:w-[68%] bg-black relative flex items-center justify-center">
                     <div id="youtube-player-container" class="w-full aspect-video"></div>
                     <div id="audio-visualizer" class="absolute inset-0 hidden flex-col items-center justify-center gap-6 p-8">
                         <div class="audio-cover-wrap relative w-40 h-40 md:w-56 md:h-56 rounded-3xl border border-primary/30 overflow-hidden shadow-2xl">
@@ -162,45 +162,62 @@
                 </div>
 
                 <!-- Content/Controls Section -->
-                <div class="w-full lg:w-[30%] flex flex-col border-l border-white/5 bg-slate-900/50 backdrop-blur-md">
-                    <div class="p-6 md:p-8 flex-1 overflow-y-auto player-sidebar">
-                        <div class="flex items-center gap-2 mb-6">
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold uppercase rounded-full border border-primary/20" id="player-episode-num">EP --</span>
-                            <span class="text-text-muted text-xs font-medium" id="player-date">---</span>
+                <div class="w-full lg:w-[32%] flex flex-col border-l border-white/5 bg-slate-900/50 backdrop-blur-md">
+                    <div class="p-5 md:p-6 flex-1 overflow-y-auto player-sidebar">
+                        <!-- Episode Info -->
+                        <div class="sidebar-section">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold uppercase rounded-full border border-primary/20" id="player-episode-num">EP --</span>
+                                <span class="text-text-muted text-xs font-medium" id="player-date">---</span>
+                            </div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white leading-tight" id="player-title">Titlu Episod</h2>
                         </div>
-                        
-                        <h2 class="text-2xl md:text-3xl font-bold text-white leading-tight mb-4" id="player-title">Titlu Episod</h2>
-                        <p class="player-description text-text-secondary leading-relaxed mb-6" id="player-desc">Descriere scurtă a episodului...</p>
 
                         <!-- Mode Toggle -->
-                        <div class="bg-black/30 p-1.5 rounded-xl flex items-center gap-1 mb-6 border border-white/5">
-                            <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-white/10 text-white shadow-sm" id="mode-video">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                Video
-                            </button>
-                            <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all text-text-muted hover:text-white hover:bg-white/5" id="mode-audio">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                                Audio
-                            </button>
+                        <div class="sidebar-section">
+                            <div class="bg-black/30 p-1.5 rounded-xl flex items-center gap-1 border border-white/5">
+                                <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-white/10 text-white shadow-sm" id="mode-video">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    Video
+                                </button>
+                                <button class="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all text-text-muted hover:text-white hover:bg-white/5" id="mode-audio">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                                    Audio
+                                </button>
+                            </div>
                         </div>
 
+                        <!-- Description -->
+                        <div class="sidebar-section">
+                            <p class="player-description text-text-secondary leading-relaxed" id="player-desc">Descriere scurtă a episodului...</p>
+                        </div>
+
+                        <!-- Comments -->
                         <section class="episode-comments" aria-label="Comentarii episod">
                             <div class="comments-head">
-                                <h3 class="comments-title">Comentarii</h3>
-                                <span id="comments-count" class="comments-count">0</span>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                    <h3 class="comments-title">Comentarii</h3>
+                                    <span id="comments-count" class="comments-count">0</span>
+                                </div>
                             </div>
+
+                            <!-- Comment Form (top, easier to find) -->
+                            <form id="comment-form" class="comment-form-top" novalidate>
+                                <div class="comment-compose">
+                                    <textarea id="comment-input" class="comment-input" maxlength="500" rows="2" placeholder="Scrie un comentariu..." required></textarea>
+                                    <div class="comment-form-actions">
+                                        <span id="comment-auth-note" class="comment-auth-note">Trebuie să fii autentificat pentru a comenta.</span>
+                                        <button id="comment-submit" type="submit" class="comment-submit">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                            Comentează
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
 
                             <div id="comments-status" class="comments-status" role="status" aria-live="polite">Se încarcă comentariile...</div>
                             <ul id="comments-list" class="comments-list" aria-live="polite"></ul>
-
-                            <form id="comment-form" class="comment-form" novalidate>
-                                <label for="comment-input" class="comment-label">Adaugă un comentariu</label>
-                                <textarea id="comment-input" class="comment-input" maxlength="500" placeholder="Scrie un comentariu (max 500 caractere)..." required></textarea>
-                                <div class="comment-form-row">
-                                    <span id="comment-auth-note" class="comment-auth-note">Trebuie să fii autentificat pentru a comenta.</span>
-                                    <button id="comment-submit" type="submit" class="comment-submit">Comentează</button>
-                                </div>
-                            </form>
                         </section>
 
                     </div>
