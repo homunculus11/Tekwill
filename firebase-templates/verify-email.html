@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Verify your email</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f3f6fb;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #1f2937;
+      }
+      .wrapper {
+        width: 100%;
+        padding: 32px 12px;
+      }
+      .card {
+        width: 100%;
+        max-width: 600px;
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+      }
+      .header {
+        background: linear-gradient(135deg, #0891b2, #2563eb);
+        color: #ffffff;
+        padding: 28px;
+      }
+      .title {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 28px;
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      .btn {
+        display: inline-block;
+        background: #0f766e;
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: bold;
+      }
+      .link-wrap {
+        margin-top: 18px;
+        padding: 12px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        word-break: break-all;
+        font-size: 13px;
+      }
+      .footer {
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.6;
+        padding: 0 28px 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="wrapper" role="presentation" width="100%">
+      <tr>
+        <td align="center">
+          <table class="card" role="presentation" width="100%">
+            <tr>
+              <td class="header">
+                <h1 class="title">Confirm your email address</h1>
+              </td>
+            </tr>
+            <tr>
+              <td class="content">
+                <p>Hello %EMAIL%,</p>
+                <p>
+                  Welcome to <strong>%APP_NAME%</strong>! Please confirm your email address to finish
+                  setting up your account.
+                </p>
+                <p style="margin: 24px 0 20px">
+                  <a class="btn" href="%LINK%" target="_blank" rel="noopener">Verify Email</a>
+                </p>
+                <p>If the button does not work, copy and paste this link into your browser:</p>
+                <div class="link-wrap">%LINK%</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="footer">
+                Verifying your email helps keep your account secure and ensures important updates
+                reach you.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

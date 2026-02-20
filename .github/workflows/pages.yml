@@ -47,6 +47,12 @@ jobs:
           mkdir -p dist/css
           find css -maxdepth 1 -name '*.css' ! -name '*.tailwind.css' -exec cp {} dist/css/ \;
 
+          rm -rf dist/firebase-templates
+          if [ -d "dist/firebase-templates" ]; then
+            echo "firebase-templates must not be deployed" >&2
+            exit 1
+          fi
+
           echo "Dist artifact contents:"
           find dist -maxdepth 3 -type f | sort
 

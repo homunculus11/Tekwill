@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educheia — Contul meu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/account.css">
+    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+</head>
+
+<body data-theme="dark">
+    <nav class="site-header">
+        <div class="header-left">
+            <a href="../index.html" class="logo-link">
+                <picture>
+                    <source srcset="../images/logo-dark.png" media="(prefers-color-scheme: light)">
+                    <source srcset="../images/logo-light.png" media="(prefers-color-scheme: dark)">
+                    <img id="header-logo" src="../images/logo-light.png" alt="Educheia Logo">
+                </picture>
+            </a>
+
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div id="header-drawer" class="header-drawer">
+            <ul id="header-items" class="header-items">
+                <li><a href="../index.html" class="header-item">Acasă</a></li>
+                <li><a href="./episodes.html" class="header-item">Toate Episoadele</a></li>
+                <li><a href="./about.html" class="header-item">Despre</a></li>
+            </ul>
+
+            <div id="header-btns" class="header-btns auth-pending">
+                <a href="./login.html" id="login-btn">Login</a>
+                <a href="./register.html" id="signup-btn">Signup</a>
+            </div>
+        </div>
+
+        <div class="header-overlay" aria-hidden="true"></div>
+    </nav>
+
+    <main class="account-main">
+        <section class="account-shell">
+            <header class="account-header">
+                <p class="account-kicker">Contul meu</p>
+                <h1>Setări cont Educheia</h1>
+                <p class="account-subtitle">Gestionează informațiile profilului și opțiunile de securitate.</p>
+            </header>
+
+            <div class="account-grid">
+                <article class="account-card account-card-profile">
+                    <h2>Profil</h2>
+                    <form id="profile-form" class="account-form" novalidate>
+                        <label for="account-name">Nume afișat</label>
+                        <input id="account-name" name="displayName" type="text" autocomplete="name" required>
+
+                        <label for="account-email">Email</label>
+                        <input id="account-email" type="email" disabled>
+
+                        <div class="account-actions">
+                            <button id="save-profile" type="submit" class="btn btn-primary">Salvează profilul</button>
+                        </div>
+                    </form>
+                </article>
+
+                <article class="account-card account-card-security">
+                    <h2>Securitate</h2>
+
+                    <div class="security-item">
+                        <p class="security-label">Verificare email</p>
+                        <p id="email-status" class="security-meta">Se verifică...</p>
+                        <button id="verify-email-btn" type="button" class="btn btn-ghost">Trimite email de verificare</button>
+                    </div>
+
+                    <div class="security-item">
+                        <p class="security-label">Parolă</p>
+                        <p class="security-meta">Poți primi un email pentru resetarea parolei.</p>
+                        <button id="reset-password-btn" type="button" class="btn btn-ghost">Trimite resetare parolă</button>
+                    </div>
+
+                    <div class="security-item danger-zone">
+                        <p class="security-label">Sesiune</p>
+                        <p class="security-meta">Închide sesiunea pe acest dispozitiv.</p>
+                        <button id="logout-account-btn" type="button" class="btn btn-danger">Logout</button>
+                    </div>
+                </article>
+            </div>
+
+            <p id="account-feedback" class="account-feedback" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2026 Educheia. Toate drepturile rezervate.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+    <script type="module" src="../js/account-nav.js"></script>
+    <script type="module" src="../js/account.js"></script>
+</body>
+
+</html>

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="../css/register.css">
     <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 </head>
 
@@ -38,7 +38,7 @@
                 <li><a href="./about.html" class="header-item">Despre</a></li>
             </ul>
 
-            <div id="header-btns" class="header-btns">
+            <div id="header-btns" class="header-btns auth-pending">
                 <a href="./login.html"><button id="login-btn" type="button">Login</button></a>
                 <a href="./register.html"><button id="signup-btn" type="button">Signup</button></a>
             </div>
@@ -49,20 +49,20 @@
 
     <main>
         <section class="main-login-box">
-            <form class="login-form" action="#" method="post">
+            <form class="register-form" action="#" method="post">
                 <h2 class="text-2xl font-bold text-center mb-6">Sign Up</h2>
 
                 <label for="username" class="block text-sm font-medium text-text-secondary mb-1">Username</label>
-                <input id="username" name="username" type="text" required>
+                <input id="username" name="username" type="text" autocomplete="username" required>
 
                 <label for="email" class="block text-sm font-medium text-text-secondary mb-1">Adresa de email</label>
-                <input id="email" name="email" type="email" required>
+                <input id="email" name="email" type="email" autocomplete="email" required>
 
                 <label for="password" class="block text-sm font-medium text-text-secondary mb-1">Parola</label>
-                <input id="password" name="password" type="password" required>
+                <input id="password" name="password" type="password" autocomplete="new-password" required>
 
                 <label for="confirm" class="block text-sm font-medium text-text-secondary mb-1">Confirmă Parola</label>
-                <input id="confirm" name="confirm" type="password" required>
+                <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
 
                 <button type="submit" class="btn btn-primary w-full">Sign Up</button>
 
@@ -85,6 +85,7 @@
     </footer>
 
     <script src="../js/script.js"></script>
+    <script type="module" src="../js/account-nav.js"></script>
     <!-- Firebase registration -->
     <script type="module" src="../js/register.js"></script>
 </body>

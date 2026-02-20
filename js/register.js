@@ -1,6 +1,21 @@
 // register.js
 import { auth } from './firebase-config.js';
-import { createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+
+const USERNAME_EMAIL_MAP_KEY = 'usernameEmailMap';
+
+const persistUsernameAlias = (username, email) => {
+    if (!username || !email) return;
+
+    try {
+        const raw = localStorage.getItem(USERNAME_EMAIL_MAP_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        parsed[String(username).trim().toLowerCase()] = String(email).trim().toLowerCase();
+        localStorage.setItem(USERNAME_EMAIL_MAP_KEY, JSON.stringify(parsed));
+    } catch {
+        return;
+    }
+};
 
 // redirect if already logged in
 onAuthStateChanged(auth, (user) => {
@@ -9,7 +24,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-const registerForm = document.querySelector('.login-form');
+const registerForm = document.querySelector('.register-form');
 
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
@@ -26,6 +41,8 @@ if (registerForm) {
 
         try {
             await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(auth.currentUser, { displayName: username });
+            persistUsernameAlias(username, email);
             // automatically send new user to episodes page
             window.location.href = './episodes.html';
         } catch (err) {

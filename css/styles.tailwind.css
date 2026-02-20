@@ -116,6 +116,48 @@
     @apply flex items-center justify-start gap-3;
   }
 
+  .header-btns.auth-pending {
+    @apply pointer-events-none opacity-0;
+  }
+
+  .account-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-border bg-bg-card px-2 py-1 no-underline transition-all duration-200;
+    opacity: 0.95;
+  }
+
+  .account-chip:hover {
+    @apply -translate-y-px border-primary;
+  }
+
+  .account-avatar {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-xs font-bold tracking-wide text-primary;
+  }
+
+  .account-meta {
+    @apply flex min-w-0 flex-col pr-2;
+  }
+
+  .account-name {
+    @apply max-w-[180px] truncate text-sm font-semibold leading-tight text-text-main;
+  }
+
+  .account-email {
+    @apply max-w-[180px] truncate text-xs leading-tight text-text-muted;
+  }
+
+  .account-logout {
+    @apply cursor-pointer rounded-xl border-[1.5px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
+  }
+
+  .account-logout:hover {
+    @apply -translate-y-px text-primary shadow-sm;
+    background-color: #13213a;
+  }
+
+  .account-logout:disabled {
+    @apply cursor-not-allowed opacity-70;
+  }
+
   .menu-toggle {
     @apply hidden h-[42px] w-[42px] cursor-pointer items-center justify-center gap-[6px] rounded-[10px] border border-border bg-bg-card p-[10px] transition-colors duration-200;
   }
@@ -314,10 +356,29 @@
       @apply grid w-full grid-cols-2 justify-start gap-[10px];
     }
 
+    .header-btns[data-auth-state='authenticated'] {
+      @apply grid-cols-1;
+    }
+
     .header-btns a,
     #login-btn,
-    #signup-btn {
+    #signup-btn,
+    .account-logout,
+    .account-chip {
       @apply w-full text-center;
+    }
+
+    .header-btns.auth-pending {
+      @apply hidden;
+    }
+
+    .account-chip {
+      @apply justify-start px-2.5;
+    }
+
+    .account-name,
+    .account-email {
+      @apply max-w-none;
     }
 
     .footer-inner {

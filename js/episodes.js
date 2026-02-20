@@ -1,33 +1,3 @@
-import { auth } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-
-// redirect and header setup
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = './login.html';
-        return;
-    }
-    // user is signed in – update header
-    const loginBtn = document.getElementById('login-btn');
-    const signupBtn = document.getElementById('signup-btn');
-    if (loginBtn) {
-        loginBtn.textContent = 'Logout';
-        loginBtn.removeAttribute('href');
-        loginBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                await signOut(auth);
-                window.location.href = './login.html';
-            } catch (err) {
-                console.error('Sign out error', err);
-            }
-        });
-    }
-    if (signupBtn) {
-        signupBtn.style.display = 'none';
-    }
-});
-
 // State
 let episodes = [];
 let originalEpisodes = []; // Store original fetch for sorting

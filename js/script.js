@@ -36,7 +36,12 @@ if (menuToggle && headerDrawer) {
 	});
 
 	headerOverlay?.addEventListener('click', closeMenu);
-	headerDrawer.querySelectorAll('a, button').forEach((el) => el.addEventListener('click', closeMenu));
+	headerDrawer.addEventListener('click', (event) => {
+		const interactive = event.target?.closest('a, button');
+		if (interactive) {
+			closeMenu();
+		}
+	});
 
 	window.addEventListener('resize', () => {
 		if (window.innerWidth > 900) {

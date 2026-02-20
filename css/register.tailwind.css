@@ -1,3 +1,11 @@
+/* subtle decorative background for the register panel */
+.main-login-box::before {
+	background: radial-gradient(circle at 10% 18%, rgba(88, 199, 214, 0.14), transparent 40%),
+		radial-gradient(circle at 82% 30%, rgba(62, 180, 195, 0.18), transparent 32%),
+		linear-gradient(135deg, rgba(17, 24, 39, 0.14) 0%, rgba(17, 24, 39, 0) 42%);
+	filter: blur(2px);
+}
+
 /* container positioning for the register box */
 .main-login-box {
 	@apply min-h-[calc(100vh-5rem)] flex items-center justify-center px-6;

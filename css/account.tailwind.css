@@ -1,0 +1,123 @@
+body {
+  @apply relative m-0 min-h-screen p-0 font-['Manrope',system-ui,-apple-system,sans-serif] text-[17px] leading-[1.6] text-text-main;
+  background: radial-gradient(circle at 14% 18%, rgba(88, 199, 214, 0.12), transparent 34%),
+    radial-gradient(circle at 82% 8%, rgba(94, 234, 212, 0.08), transparent 28%),
+    linear-gradient(160deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0) 35%), var(--color-bg-main);
+}
+
+body::before {
+  content: '';
+  @apply pointer-events-none fixed inset-0;
+  background: radial-gradient(circle at 20% 20%, rgba(88, 199, 214, 0.08), transparent 42%),
+    radial-gradient(circle at 80% 12%, rgba(88, 199, 214, 0.06), transparent 30%);
+  z-index: 0;
+}
+
+/* page frame */
+.account-main {
+  @apply relative min-h-[calc(100vh-5rem)] px-6 py-10;
+  z-index: 1;
+}
+
+.account-shell {
+  @apply relative z-[1] mx-auto w-full max-w-5xl;
+}
+
+.account-header {
+  @apply mb-8;
+}
+
+.account-kicker {
+  @apply m-0 text-sm font-semibold uppercase tracking-[0.14em] text-primary;
+}
+
+.account-header h1 {
+  @apply m-0 mt-2 text-3xl font-bold text-text-main;
+}
+
+.account-subtitle {
+  @apply m-0 mt-2 text-text-secondary;
+}
+
+.account-grid {
+  @apply grid gap-6 lg:grid-cols-2;
+}
+
+.account-card {
+  @apply rounded-2xl border border-border bg-bg-card p-6 shadow-md backdrop-blur-sm;
+  opacity: 0.98;
+}
+
+.account-card h2 {
+  @apply m-0 mb-5 text-xl font-semibold text-text-main;
+}
+
+.account-form {
+  @apply flex flex-col gap-2;
+}
+
+.account-form label {
+  @apply text-sm font-medium text-text-secondary;
+}
+
+.account-form input {
+  @apply mb-3 w-full rounded-lg border border-border bg-transparent px-4 py-2 text-text-main focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+.account-form input:disabled {
+  @apply cursor-not-allowed opacity-80;
+}
+
+.account-actions {
+  @apply mt-2;
+}
+
+.security-item {
+  @apply mb-5 rounded-xl border border-border bg-bg-section p-4;
+}
+
+.security-item:last-child {
+  @apply mb-0;
+}
+
+.security-label {
+  @apply m-0 text-base font-semibold text-text-main;
+}
+
+.security-meta {
+  @apply m-0 mb-3 mt-1 text-sm text-text-secondary;
+}
+
+.btn-danger {
+  @apply rounded-xl border border-red-400/50 bg-red-400/15 px-4 py-2 font-semibold text-red-200 transition-all duration-200;
+}
+
+.btn-danger:hover {
+  @apply -translate-y-px bg-red-400/25;
+}
+
+.account-feedback {
+  @apply mt-5 min-h-6 text-sm font-medium text-text-secondary;
+}
+
+.account-feedback.is-success {
+  @apply text-success;
+}
+
+.account-feedback.is-error {
+  @apply text-red-300;
+}
+
+.site-header {
+  z-index: 20;
+}
+
+@media (max-width: 900px) {
+  .account-main {
+    @apply px-4 py-6;
+  }
+
+  .account-header h1 {
+    @apply text-2xl;
+  }
+}
