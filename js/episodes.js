@@ -21,6 +21,7 @@ let playerState = {
 };
 
 let currentAuthUser = null;
+let currentAuthClaims = {};
 let activeCommentsRequestId = 0;
 let isSubmittingComment = false;
 let isCommentActionPending = false;
@@ -606,9 +607,24 @@ const formatCommentTimestamp = (value) => {
     }
 };
 
+const getUserClaims = async (user) => {
+    if (!user) return {};
+
+    try {
+        const tokenResult = await user.getIdTokenResult(true);
+        return tokenResult?.claims || {};
+    } catch {
+        return {};
+    }
+};
+
+const isCurrentUserAdmin = () => Boolean(currentAuthClaims?.admin);
+
 const canManageComment = (comment) => {
     const uid = currentAuthUser?.uid;
-    return Boolean(uid && comment?.authorUid === uid);
+    if (!uid) return false;
+
+    return Boolean(comment?.authorUid === uid || isCurrentUserAdmin());
 };
 
 const getCommentsElements = () => ({
@@ -883,8 +899,9 @@ const setupComments = () => {
 
     form.addEventListener('submit', handleCommentSubmit);
     list.addEventListener('click', handleCommentActions);
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         currentAuthUser = user || null;
+        currentAuthClaims = currentAuthUser ? await getUserClaims(currentAuthUser) : {};
         updateCommentFormState();
 
         const episodeId = playerState.currentEpisode?.videoId;

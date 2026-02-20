@@ -16,6 +16,7 @@ const verifyBtn = document.getElementById('verify-email-btn');
 const resetPasswordBtn = document.getElementById('reset-password-btn');
 const logoutBtn = document.getElementById('logout-account-btn');
 const saveProfileBtn = document.getElementById('save-profile');
+const accountRoleStatus = document.getElementById('account-role-status');
 
 const setFeedback = (message, type = '') => {
     if (!feedback) return;
@@ -62,14 +63,37 @@ const renderUser = (user) => {
     }
 };
 
+const getUserClaims = async (user) => {
+    if (!user) return {};
+
+    try {
+        const tokenResult = await user.getIdTokenResult(true);
+        return tokenResult?.claims || {};
+    } catch {
+        return {};
+    }
+};
+
+const renderRoleStatus = (claims = {}) => {
+    if (!accountRoleStatus) return;
+
+    const isAdmin = Boolean(claims?.admin);
+    accountRoleStatus.classList.toggle('is-admin', isAdmin);
+    accountRoleStatus.textContent = isAdmin
+        ? 'Rol cont: Admin. Ai acces la funcționalitățile administrative.'
+        : 'Rol cont: Membru.';
+};
+
 const initAccountPage = () => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = './login.html';
             return;
         }
 
+        const claims = await getUserClaims(user);
         renderUser(user);
+        renderRoleStatus(claims);
         setFeedback('Datele contului au fost încărcate.', 'success');
     });
 

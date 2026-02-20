@@ -379,11 +379,11 @@ body.player-open {
 }
 
 .episode-comments {
-    @apply mt-1 rounded-2xl border border-white/10 bg-black/20 p-4;
+    @apply mt-6 rounded-2xl border border-white/10 bg-black/25 p-4 md:p-5;
 }
 
 .comments-head {
-    @apply flex items-center justify-between mb-3;
+    @apply flex items-center justify-between gap-3 mb-3 pb-2 border-b border-white/10;
 }
 
 .comments-title {
@@ -395,31 +395,31 @@ body.player-open {
 }
 
 .comments-status {
-    @apply text-xs text-white/60 mb-2;
+    @apply text-xs text-white/60 mb-2 min-h-[1rem];
 }
 
 .comments-list {
-    @apply space-y-2 max-h-56 overflow-y-auto pr-1;
+    @apply space-y-2.5 max-h-64 overflow-y-auto pr-1;
 }
 
 .comment-item {
-    @apply rounded-xl border border-white/10 bg-white/5 p-3;
+    @apply rounded-xl border border-white/10 bg-white/5 p-3.5;
 }
 
 .comment-item-head {
-    @apply flex items-center justify-between gap-2 mb-1;
+    @apply flex flex-col items-start gap-2 mb-1.5 sm:flex-row sm:items-center sm:justify-between;
 }
 
 .comment-item-meta {
-    @apply min-w-0;
+    @apply min-w-0 flex-1;
 }
 
 .comment-item-actions {
-    @apply flex items-center gap-1.5;
+    @apply flex items-center gap-1.5 self-end sm:self-auto;
 }
 
 .comment-action-btn {
-    @apply px-2 py-1 rounded-md text-[11px] font-semibold border border-white/10 bg-white/5 text-white/80 transition-all;
+    @apply h-7 min-w-[72px] px-2.5 py-1 rounded-md text-[11px] font-semibold border border-white/10 bg-white/5 text-white/80 transition-all inline-flex items-center justify-center;
 }
 
 .comment-action-btn:hover {
@@ -447,11 +447,11 @@ body.player-open {
 }
 
 .comment-body {
-    @apply text-sm text-white/80 leading-relaxed break-words;
+    @apply text-sm text-white/80 leading-relaxed break-words pt-0.5;
 }
 
 .comment-form {
-    @apply mt-3 space-y-2;
+    @apply mt-4 space-y-2.5 pt-3 border-t border-white/10;
 }
 
 .comment-label {
@@ -459,20 +459,20 @@ body.player-open {
 }
 
 .comment-input {
-    @apply w-full min-h-[88px] rounded-xl border border-white/10 bg-white/5 text-sm text-white px-3 py-2 placeholder:text-white/40 focus:outline-none focus:border-primary;
+    @apply w-full min-h-[96px] rounded-xl border border-white/10 bg-white/5 text-sm text-white px-3 py-2.5 placeholder:text-white/40 focus:outline-none focus:border-primary;
     resize: vertical;
 }
 
 .comment-form-row {
-    @apply flex items-center justify-between gap-3;
+    @apply flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:justify-between;
 }
 
 .comment-auth-note {
-    @apply text-[11px] text-white/50;
+    @apply text-[11px] text-white/50 leading-snug;
 }
 
 .comment-submit {
-    @apply px-3 py-1.5 rounded-lg bg-primary text-slate-900 text-xs font-semibold transition-all;
+    @apply h-9 px-4 py-1.5 rounded-lg bg-primary text-slate-900 text-xs font-semibold transition-all inline-flex items-center justify-center;
 }
 
 .comment-submit:disabled {

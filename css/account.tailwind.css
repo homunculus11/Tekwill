@@ -39,6 +39,14 @@ body::before {
   @apply m-0 mt-2 text-text-secondary;
 }
 
+.account-role-status {
+  @apply mt-3 inline-flex w-fit items-center rounded-full border border-border bg-bg-section px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-text-muted;
+}
+
+.account-role-status.is-admin {
+  @apply border-primary bg-primary-soft text-primary;
+}
+
 .account-grid {
   @apply grid gap-6 lg:grid-cols-2;
 }

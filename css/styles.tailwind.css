@@ -145,6 +145,14 @@
     @apply max-w-[180px] truncate text-xs leading-tight text-text-muted;
   }
 
+  .account-role {
+    @apply mt-0.5 inline-flex w-fit items-center rounded-full border border-border bg-bg-section px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted;
+  }
+
+  .account-role-admin {
+    @apply border-primary bg-primary-soft text-primary;
+  }
+
   .account-logout {
     @apply cursor-pointer rounded-xl border-[1.5px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
   }

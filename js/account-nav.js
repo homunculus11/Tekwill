@@ -25,6 +25,17 @@ const getDisplayName = (user) => {
     return email.split('@')[0] || 'Contul meu';
 };
 
+const getUserClaims = async (user) => {
+    if (!user) return {};
+
+    try {
+        const tokenResult = await user.getIdTokenResult(true);
+        return tokenResult?.claims || {};
+    } catch {
+        return {};
+    }
+};
+
 const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
@@ -52,13 +63,17 @@ const renderGuestActions = (container) => {
     container.removeAttribute('data-auth-state');
 };
 
-const renderUserActions = (container, user) => {
+const renderUserActions = (container, user, options = {}) => {
     const displayName = getDisplayName(user);
     const email = user?.email || 'Utilizator autentificat';
     const initials = getInitials(displayName);
+    const isAdmin = Boolean(options?.isAdmin);
     const safeDisplayName = escapeHtml(displayName);
     const safeEmail = escapeHtml(email);
     const safeInitials = escapeHtml(initials);
+    const roleLabel = isAdmin ? 'Admin' : 'Membru';
+    const safeRoleLabel = escapeHtml(roleLabel);
+    const roleClassName = isAdmin ? 'account-role account-role-admin' : 'account-role';
 
     container.innerHTML = `
         <a href="${getRoute('account')}" class="account-chip" title="Gestionează contul" aria-label="Deschide pagina contului">
@@ -66,6 +81,7 @@ const renderUserActions = (container, user) => {
             <span class="account-meta">
                 <span class="account-name">${safeDisplayName}</span>
                 <span class="account-email">${safeEmail}</span>
+                <span class="${roleClassName}">${safeRoleLabel}</span>
             </span>
         </a>
         <button type="button" id="login-btn" class="account-logout" aria-label="Logout">Logout</button>
@@ -126,7 +142,7 @@ const initAccountNav = () => {
         finalizeRender();
     }, AUTH_RENDER_FALLBACK_MS);
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         window.clearTimeout(fallbackId);
 
         if (!user) {
@@ -135,8 +151,9 @@ const initAccountNav = () => {
             return;
         }
 
+        const claims = await getUserClaims(user);
         saveUsernameEmailAlias(user);
-        renderUserActions(container, user);
+        renderUserActions(container, user, { isAdmin: Boolean(claims?.admin) });
         finalizeRender();
     }, () => {
         window.clearTimeout(fallbackId);
