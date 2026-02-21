@@ -1,7 +1,3 @@
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-
 // State
 let episodes = [];
 let originalEpisodes = []; // Store original fetch for sorting
@@ -27,10 +23,125 @@ let activeCommentsRequestId = 0;
 let isSubmittingComment = false;
 let isCommentActionPending = false;
 const commentsById = new Map();
+let isPlayerSetupComplete = false;
+let mobileActiveCardIndex = 0;
+let mobileCardsObserver = null;
+let commentsSetupPromise = null;
+let auth = null;
+let db = null;
+let onAuthStateChangedFn = null;
+let addDocFn = null;
+let collectionFn = null;
+let deleteDocFn = null;
+let docFn = null;
+let getDocsFn = null;
+let limitFn = null;
+let orderByFn = null;
+let queryFn = null;
+let serverTimestampFn = null;
+let updateDocFn = null;
+let firebaseReadyPromise = null;
 
 let lastFocusedElement = null;
 
 const isMobileLayout = () => window.matchMedia('(max-width: 767px)').matches;
+
+const EPISODES_CACHE_KEY = 'episodesCacheV1';
+const EPISODES_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
+const readEpisodesCache = () => {
+    try {
+        const raw = localStorage.getItem(EPISODES_CACHE_KEY);
+        if (!raw) return [];
+
+        const parsed = JSON.parse(raw);
+        const timestamp = Number(parsed?.timestamp || 0);
+        const items = Array.isArray(parsed?.items) ? parsed.items : [];
+
+        if (!timestamp || (Date.now() - timestamp) > EPISODES_CACHE_TTL_MS || !items.length) {
+            return [];
+        }
+
+        return items.map((item) => ({
+            ...item,
+            dateObj: new Date(item.publishedAt || Date.now())
+        }));
+    } catch {
+        return [];
+    }
+};
+
+const writeEpisodesCache = (items = []) => {
+    if (!Array.isArray(items) || !items.length) return;
+
+    try {
+        const payload = items.map((item) => ({
+            videoId: item.videoId,
+            title: item.title,
+            description: item.description,
+            publishedAt: item.publishedAt,
+            thumbnails: item.thumbnails
+        }));
+
+        localStorage.setItem(EPISODES_CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            items: payload
+        }));
+    } catch {
+        return;
+    }
+};
+
+const normalizeEpisodeItems = (rawItems = []) => rawItems.map((item) => {
+    const snippet = item.snippet || item;
+    return {
+        videoId: (snippet.resourceId && snippet.resourceId.videoId) || item.videoId,
+        title: snippet.title,
+        description: snippet.description,
+        publishedAt: snippet.publishedAt,
+        thumbnails: snippet.thumbnails,
+        dateObj: new Date(snippet.publishedAt)
+    };
+});
+
+const ensureFirebaseReady = async () => {
+    if (firebaseReadyPromise) {
+        return firebaseReadyPromise;
+    }
+
+    firebaseReadyPromise = Promise.all([
+        import('./firebase-config.js'),
+        import('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js'),
+        import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js')
+    ]).then(([firebaseConfigModule, authModule, firestoreModule]) => {
+        auth = firebaseConfigModule.auth;
+        db = firebaseConfigModule.db;
+
+        onAuthStateChangedFn = authModule.onAuthStateChanged;
+
+        addDocFn = firestoreModule.addDoc;
+        collectionFn = firestoreModule.collection;
+        deleteDocFn = firestoreModule.deleteDoc;
+        docFn = firestoreModule.doc;
+        getDocsFn = firestoreModule.getDocs;
+        limitFn = firestoreModule.limit;
+        orderByFn = firestoreModule.orderBy;
+        queryFn = firestoreModule.query;
+        serverTimestampFn = firestoreModule.serverTimestamp;
+        updateDocFn = firestoreModule.updateDoc;
+    }).catch((error) => {
+        firebaseReadyPromise = null;
+        throw error;
+    });
+
+    return firebaseReadyPromise;
+};
+
+const ensurePlayerSetup = () => {
+    if (isPlayerSetupComplete) return;
+    setupPlayer();
+    isPlayerSetupComplete = true;
+};
 
 const updateTrackProgressGeometry = () => {
     if (isMobileLayout()) return;
@@ -51,6 +162,10 @@ const updateTrackProgressGeometry = () => {
 const renderMobileTrackMarkers = () => {
     if (!isMobileLayout()) {
         mobileTrackMarkers = [];
+        if (mobileCardsObserver) {
+            mobileCardsObserver.disconnect();
+            mobileCardsObserver = null;
+        }
         return;
     }
     if (!horizontalTrack || !cards?.length) return;
@@ -81,33 +196,63 @@ const renderMobileTrackMarkers = () => {
     });
 };
 
-const updateMobileTrackMarkerState = (progress = 0) => {
+const updateMobileTrackMarkerState = (activeIndex = 0) => {
     if (!isMobileLayout() || !cards?.length || !mobileTrackMarkers.length) return;
-
-    let activeIndex = 0;
-    let minDistance = Infinity;
-    const viewportAnchor = window.innerHeight * 0.45;
-
-    cards.forEach((card, index) => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.top + (rect.height / 2);
-        const distance = Math.abs(cardCenter - viewportAnchor);
-
-        if (distance < minDistance) {
-            minDistance = distance;
-            activeIndex = index;
-        }
-    });
 
     cards.forEach((card, index) => {
         card.classList.toggle('active', index === activeIndex);
     });
 
     mobileTrackMarkers.forEach((marker, index) => {
-        const markerTopPercent = Number.parseFloat(marker.style.top || '0') / 100;
-        marker.classList.toggle('is-passed', markerTopPercent <= progress + 0.002 || index <= activeIndex);
+        marker.classList.toggle('is-passed', index <= activeIndex);
         marker.classList.toggle('is-active', index === activeIndex);
     });
+
+    const fillTrack = document.getElementById('timeline-fill-track');
+    if (fillTrack) {
+        const denominator = Math.max(1, cards.length - 1);
+        const progress = (activeIndex / denominator) * 100;
+        fillTrack.style.height = `${progress}%`;
+        fillTrack.style.width = '';
+    }
+};
+
+const setupMobileCardsObserver = () => {
+    if (!isMobileLayout() || !cards?.length) return;
+
+    if (mobileCardsObserver) {
+        mobileCardsObserver.disconnect();
+    }
+
+    mobileCardsObserver = new IntersectionObserver((entries) => {
+        let bestIndex = mobileActiveCardIndex;
+        let bestRatio = 0;
+
+        entries.forEach((entry) => {
+            const index = Number(entry.target?.dataset?.index ?? -1);
+            if (index < 0) return;
+            if (entry.isIntersecting && entry.intersectionRatio >= bestRatio) {
+                bestRatio = entry.intersectionRatio;
+                bestIndex = index;
+            }
+        });
+
+        if (bestIndex !== mobileActiveCardIndex) {
+            mobileActiveCardIndex = bestIndex;
+            updateMobileTrackMarkerState(mobileActiveCardIndex);
+        }
+    }, {
+        root: null,
+        threshold: [0.4, 0.6, 0.8],
+        rootMargin: '-10% 0px -35% 0px'
+    });
+
+    cards.forEach((card) => {
+        mobileCardsObserver.observe(card);
+    });
+
+    mobileActiveCardIndex = 0;
+    updateMobileTrackMarkerState(mobileActiveCardIndex);
 };
 
 // Utils
@@ -157,24 +302,21 @@ const init = async () => {
     renderSkeletonCards();
     setupScroll();
 
+    const cachedItems = readEpisodesCache();
+    if (cachedItems.length) {
+        originalEpisodes = cachedItems;
+        episodes = [...originalEpisodes].sort((a, b) => b.dateObj - a.dateObj);
+        renderCards();
+        updateScroll();
+    }
+
     // 1. Fetch Episodes
     try {
         if (typeof getEpisodes === 'function') {
             const data = await getEpisodes();
             const rawItems = (data && data.items) ? data.items : [];
-            
-            // Normalize Data
-            originalEpisodes = rawItems.map(item => {
-                 const snippet = item.snippet || item;
-                 return {
-                     videoId: (snippet.resourceId && snippet.resourceId.videoId) || item.videoId,
-                     title: snippet.title,
-                     description: snippet.description,
-                     publishedAt: snippet.publishedAt,
-                     thumbnails: snippet.thumbnails,
-                     dateObj: new Date(snippet.publishedAt)
-                 };
-            });
+            originalEpisodes = normalizeEpisodeItems(rawItems);
+            writeEpisodesCache(originalEpisodes);
             
             // Default Sort: Newest First
             episodes = [...originalEpisodes].sort((a, b) => b.dateObj - a.dateObj);
@@ -200,8 +342,7 @@ const init = async () => {
     // 3. Setup Scroll Logic (re-calibrate with real cards)
     updateScroll();
 
-    // 4. Setup Player
-    setupPlayer();
+    // 4. Player setup is deferred until first open (mobile perf)
     
     // 5. Check URL
     checkUrlForEpisode();
@@ -280,16 +421,25 @@ const renderCards = () => {
     `;
     horizontalTrack.appendChild(connector);
 
+    const mobileLayout = isMobileLayout();
+
     episodes.forEach((ep, index) => {
         // Thumbnail logic
         let imageUrl = '../images/logo-light.webp';
         if (ep.thumbnails) {
-            imageUrl = ep.thumbnails.maxres?.url || ep.thumbnails.high?.url || ep.thumbnails.medium?.url;
+            imageUrl = mobileLayout
+                ? (ep.thumbnails.medium?.url || ep.thumbnails.high?.url || ep.thumbnails.maxres?.url)
+                : (ep.thumbnails.maxres?.url || ep.thumbnails.high?.url || ep.thumbnails.medium?.url);
         } else if (ep.videoId) {
-            imageUrl = `https://img.youtube.com/vi/${ep.videoId}/hqdefault.jpg`;
+            imageUrl = mobileLayout
+                ? `https://img.youtube.com/vi/${ep.videoId}/mqdefault.jpg`
+                : `https://img.youtube.com/vi/${ep.videoId}/hqdefault.jpg`;
         }
         const safeImageUrl = sanitizeImageUrl(imageUrl);
         const safeTitle = escapeHtml(ep.title || 'Episod fără titlu');
+        const isLcpCandidate = index === 0;
+        const imageLoading = isLcpCandidate ? 'eager' : 'lazy';
+        const imageFetchPriority = isLcpCandidate ? 'high' : 'auto';
         
         // Use index for numbering display, but respect sort order
         // If sorting desc (newest first), display numbers N down to 1?
@@ -312,7 +462,7 @@ const renderCards = () => {
 
         card.innerHTML = `
             <div class="card-image-wrapper">
-                <img src="${safeImageUrl}" alt="${safeTitle}" class="card-image" loading="lazy" referrerpolicy="no-referrer" onload="this.classList.add('loaded')" onerror="this.classList.add('loaded')">
+                <img src="${safeImageUrl}" alt="${safeTitle}" class="card-image" loading="${imageLoading}" fetchpriority="${imageFetchPriority}" decoding="async" width="1280" height="720" sizes="(max-width: 767px) 100vw, 78vw" referrerpolicy="no-referrer">
                 <div class="card-content">
                     <span class="episode-number">Episodul ${displayNum}</span>
                     <h3 class="episode-title">${safeTitle}</h3>
@@ -353,6 +503,7 @@ const renderCards = () => {
     timelineFillTrack = document.getElementById('timeline-fill-track');
     updateTrackProgressGeometry();
     renderMobileTrackMarkers();
+    setupMobileCardsObserver();
 };
 
 const setupScroll = () => {
@@ -504,18 +655,6 @@ const handleSnap = () => {
 
 const updateScroll = () => {
     if (isMobileLayout()) {
-        const track = document.getElementById('horizontal-track');
-        const fillTrack = document.getElementById('timeline-fill-track');
-        if (track && fillTrack) {
-            const trackRect = track.getBoundingClientRect();
-            const scrollable = trackRect.height - windowHeight;
-            const progress = scrollable > 0
-                ? Math.max(0, Math.min(1, -trackRect.top / scrollable))
-                : 0;
-            fillTrack.style.height = `${progress * 100}%`;
-            fillTrack.style.width = '';
-            updateMobileTrackMarkerState(progress);
-        }
         return;
     }
     if (!scrollContainer || !horizontalTrack) return;
@@ -646,6 +785,7 @@ let optimisticTimelineLastTick = 0;
 let seekHoldTargetSeconds = null;
 let youtubeApiRetryCount = 0;
 const MAX_YOUTUBE_API_RETRIES = 50;
+let youtubeApiReadyPromise = null;
 
 const PLAYBACK_MEMORY_KEY = 'episodePlaybackPositions';
 const COMMENTS_COLLECTION = 'episodeComments';
@@ -867,7 +1007,7 @@ const renderComments = (comments = []) => {
 
 const loadEpisodeComments = async (episodeId) => {
     const { list, count } = getCommentsElements();
-    if (!episodeId || !list || !count) return;
+    if (!episodeId || !list || !count || !db || !collectionFn || !queryFn || !orderByFn || !limitFn || !getDocsFn) return;
 
     const requestId = ++activeCommentsRequestId;
     count.textContent = '0';
@@ -875,9 +1015,9 @@ const loadEpisodeComments = async (episodeId) => {
     renderCommentSkeletons(3);
 
     try {
-        const commentsRef = collection(db, COMMENTS_COLLECTION, episodeId, 'items');
-        const commentsQuery = query(commentsRef, orderBy('createdAt', 'desc'), limit(50));
-        const snapshot = await getDocs(commentsQuery);
+        const commentsRef = collectionFn(db, COMMENTS_COLLECTION, episodeId, 'items');
+        const commentsQuery = queryFn(commentsRef, orderByFn('createdAt', 'desc'), limitFn(50));
+        const snapshot = await getDocsFn(commentsQuery);
 
         if (requestId !== activeCommentsRequestId) return;
 
@@ -928,13 +1068,18 @@ const handleCommentSubmit = async (event) => {
     setCommentsStatus('Se publică comentariul...');
 
     try {
-        const commentsRef = collection(db, COMMENTS_COLLECTION, episodeId, 'items');
-        await addDoc(commentsRef, {
+        if (!db || !collectionFn || !addDocFn || !serverTimestampFn) {
+            setCommentsStatus('Comentariile nu sunt disponibile momentan. Încearcă din nou.');
+            return;
+        }
+
+        const commentsRef = collectionFn(db, COMMENTS_COLLECTION, episodeId, 'items');
+        await addDocFn(commentsRef, {
             body,
             authorUid: currentAuthUser.uid,
             authorName: getCommentDisplayName(currentAuthUser),
             authorEmail: currentAuthUser.email || '',
-            createdAt: serverTimestamp()
+            createdAt: serverTimestampFn()
         });
 
         input.value = '';
@@ -973,7 +1118,12 @@ const handleCommentActions = async (event) => {
         return;
     }
 
-    const commentRef = doc(db, COMMENTS_COLLECTION, episodeId, 'items', commentId);
+    if (!db || !docFn) {
+        setCommentsStatus('Comentariile nu sunt disponibile momentan.');
+        return;
+    }
+
+    const commentRef = docFn(db, COMMENTS_COLLECTION, episodeId, 'items', commentId);
 
     if (action === 'delete') {
         const shouldDelete = window.confirm('Vrei să ștergi acest comentariu?');
@@ -984,7 +1134,8 @@ const handleCommentActions = async (event) => {
         setCommentsStatus('Se șterge comentariul...');
 
         try {
-            await deleteDoc(commentRef);
+            if (!deleteDocFn) throw new Error('Delete action unavailable');
+            await deleteDocFn(commentRef);
             await loadEpisodeComments(episodeId);
             setCommentsStatus('Comentariul a fost șters.');
         } catch (error) {
@@ -1023,7 +1174,8 @@ const handleCommentActions = async (event) => {
         setCommentsStatus('Se actualizează comentariul...');
 
         try {
-            await updateDoc(commentRef, { body: nextBody });
+            if (!updateDocFn) throw new Error('Update action unavailable');
+            await updateDocFn(commentRef, { body: nextBody });
             await loadEpisodeComments(episodeId);
             setCommentsStatus('Comentariul a fost actualizat.');
         } catch (error) {
@@ -1037,12 +1189,25 @@ const handleCommentActions = async (event) => {
 };
 
 const setupComments = () => {
+    if (commentsSetupPromise) {
+        return commentsSetupPromise;
+    }
+
+    commentsSetupPromise = (async () => {
+        try {
+            await ensureFirebaseReady();
+        } catch {
+            setCommentsStatus('Comentariile sunt indisponibile momentan.');
+            updateCommentFormState();
+            return;
+        }
+
     const { form, list } = getCommentsElements();
     if (!form || !list) return;
 
     form.addEventListener('submit', handleCommentSubmit);
     list.addEventListener('click', handleCommentActions);
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChangedFn(auth, async (user) => {
         currentAuthUser = user || null;
         currentAuthClaims = currentAuthUser ? await getUserClaims(currentAuthUser) : {};
         updateCommentFormState();
@@ -1054,6 +1219,9 @@ const setupComments = () => {
     });
 
     updateCommentFormState();
+    })();
+
+    return commentsSetupPromise;
 };
 
 const updateRangeProgress = (rangeInput, activeColor = 'rgba(88, 199, 214, 1)', trackColor = 'rgba(255, 255, 255, 0.22)') => {
@@ -1380,14 +1548,6 @@ const setupPlayerControls = () => {
 };
 
 const setupPlayer = () => {
-    // Inject YouTube API if not present
-    if (!window.YT) {
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
     // Close Button
     document.getElementById('close-player')?.addEventListener('click', closePlayer);
     document.getElementById('player-modal')?.addEventListener('click', (event) => {
@@ -1453,7 +1613,67 @@ const setupPlayer = () => {
     });
 };
 
+const ensureYouTubeApiReady = () => {
+    if (window.YT?.Player) {
+        return Promise.resolve();
+    }
+
+    if (youtubeApiReadyPromise) {
+        return youtubeApiReadyPromise;
+    }
+
+    youtubeApiReadyPromise = new Promise((resolve, reject) => {
+        const previousOnReady = window.onYouTubeIframeAPIReady;
+        let settled = false;
+
+        const finalizeReady = () => {
+            if (settled) return;
+            settled = true;
+            if (typeof previousOnReady === 'function') {
+                try {
+                    previousOnReady();
+                } catch {
+                    return;
+                }
+            }
+            resolve();
+        };
+
+        window.onYouTubeIframeAPIReady = finalizeReady;
+
+        const existingTag = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+        if (!existingTag) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            tag.async = true;
+            tag.onerror = () => {
+                if (settled) return;
+                settled = true;
+                reject(new Error('Failed to load YouTube Iframe API'));
+            };
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+        setTimeout(() => {
+            if (settled) return;
+            if (window.YT?.Player) {
+                finalizeReady();
+                return;
+            }
+            settled = true;
+            reject(new Error('Timed out waiting for YouTube Iframe API'));
+        }, 10000);
+    }).catch((error) => {
+        youtubeApiReadyPromise = null;
+        throw error;
+    });
+
+    return youtubeApiReadyPromise;
+};
+
 const openPlayer = (episode) => {
+    ensurePlayerSetup();
     playerState.isOpen = true;
     playerState.currentEpisode = episode;
     lastFocusedElement = document.activeElement;
@@ -1463,6 +1683,7 @@ const openPlayer = (episode) => {
     modal.classList.remove('opacity-0', 'pointer-events-none');
     modal.classList.add('opacity-100', 'pointer-events-auto');
     modal.setAttribute('aria-hidden', 'false');
+    modal.removeAttribute('inert');
     modal.classList.remove('scale-95');
     modal.classList.add('scale-100');
     document.body.classList.add('player-open');
@@ -1505,7 +1726,9 @@ const openPlayer = (episode) => {
     // Update URL hash without reload
     history.replaceState(null, '', `#${encodeURIComponent(episode.videoId)}`);
 
-    loadEpisodeComments(episode.videoId);
+    setupComments().then(() => {
+        loadEpisodeComments(episode.videoId);
+    });
 
     loadYoutubeVideo(episode.videoId);
 };
@@ -1523,6 +1746,7 @@ const closePlayer = () => {
     modal.classList.add('opacity-0', 'pointer-events-none');
     modal.classList.remove('opacity-100', 'pointer-events-auto');
     modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('inert', '');
     modal.classList.add('scale-95');
     modal.classList.remove('scale-100');
     document.body.classList.remove('player-open');
@@ -1561,67 +1785,65 @@ const closePlayer = () => {
     history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
 };
 
-const loadYoutubeVideo = (videoId) => {
-    if (window.YT && window.YT.Player) {
-        youtubeApiRetryCount = 0;
-        if (youtubePlayer) {
-            isPlayerReady = true;
-            youtubePlayer.cueVideoById({
-                videoId,
-                startSeconds: pendingSeekTime || 0,
-                suggestedQuality: DEFAULT_QUALITY,
-            });
-            applyInitialPlayerSettings();
-            startTimelineSync();
-            scheduleQualityEnforcement();
-        } else {
-            youtubePlayer = new YT.Player('youtube-player-container', {
-                height: '100%',
-                width: '100%',
-                videoId: videoId,
-                playerVars: {
-                    'playsinline': 1,
-                    'autoplay': 0,
-                    'controls': 0,
-                    'disablekb': 1,
-                    'fs': 0,
-                    'iv_load_policy': 3,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'cc_load_policy': 0,
-                    'vq': DEFAULT_QUALITY,
-                },
-                events: {
-                    'onReady': () => {
-                        isPlayerReady = true;
-                        youtubePlayer.cueVideoById({
-                            videoId,
-                            startSeconds: pendingSeekTime || 0,
-                            suggestedQuality: DEFAULT_QUALITY,
-                        });
-                        applyInitialPlayerSettings();
-                        applyPendingSeek();
-                        startTimelineSync();
-                        updateTimelineUI();
-                        scheduleQualityEnforcement();
-                    },
-                    'onStateChange': onPlayerStateChange,
-                    'onPlaybackQualityChange': () => {
-                        applyBestVideoQuality();
-                    }
-                }
-            });
-        }
-    } else {
-        // Retry if API not ready
-        if (youtubeApiRetryCount >= MAX_YOUTUBE_API_RETRIES) {
-            console.error('YouTube API failed to load after retries.');
-            return;
-        }
-
-        youtubeApiRetryCount += 1;
-        setTimeout(() => loadYoutubeVideo(videoId), 100);
+const loadYoutubeVideo = async (videoId) => {
+    try {
+        await ensureYouTubeApiReady();
+    } catch (error) {
+        console.error('YouTube API failed to load.', error);
+        return;
     }
+
+    youtubeApiRetryCount = 0;
+    if (youtubePlayer) {
+        isPlayerReady = true;
+        youtubePlayer.cueVideoById({
+            videoId,
+            startSeconds: pendingSeekTime || 0,
+            suggestedQuality: DEFAULT_QUALITY,
+        });
+        applyInitialPlayerSettings();
+        startTimelineSync();
+        scheduleQualityEnforcement();
+        return;
+    }
+
+    youtubePlayer = new YT.Player('youtube-player-container', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        host: 'https://www.youtube-nocookie.com',
+        playerVars: {
+            'playsinline': 1,
+            'autoplay': 0,
+            'controls': 0,
+            'disablekb': 1,
+            'fs': 0,
+            'iv_load_policy': 3,
+            'modestbranding': 1,
+            'rel': 0,
+            'cc_load_policy': 0,
+            'vq': DEFAULT_QUALITY,
+        },
+        events: {
+            'onReady': () => {
+                isPlayerReady = true;
+                youtubePlayer.cueVideoById({
+                    videoId,
+                    startSeconds: pendingSeekTime || 0,
+                    suggestedQuality: DEFAULT_QUALITY,
+                });
+                applyInitialPlayerSettings();
+                applyPendingSeek();
+                startTimelineSync();
+                updateTimelineUI();
+                scheduleQualityEnforcement();
+            },
+            'onStateChange': onPlayerStateChange,
+            'onPlaybackQualityChange': () => {
+                applyBestVideoQuality();
+            }
+        }
+    });
 };
 
 const setPlayerMode = (mode) => {

@@ -399,7 +399,7 @@ body.player-open {
 }
 
 .comments-status {
-    @apply text-xs text-white/50 mb-2 min-h-[1rem] text-center;
+    @apply text-xs text-white/70 mb-2 min-h-[1rem] text-center;
 }
 
 /* Comment compose form at top */
@@ -412,7 +412,7 @@ body.player-open {
 }
 
 .comment-form-top .comment-input {
-    @apply w-full border-0 bg-transparent text-sm text-white px-3.5 py-3 placeholder:text-white/35 focus:outline-none;
+    @apply w-full border-0 bg-transparent text-sm text-white px-3.5 py-3 placeholder:text-white/55 focus:outline-none;
     min-height: 52px;
     max-height: 120px;
     resize: none;
@@ -427,7 +427,7 @@ body.player-open {
 }
 
 .comment-auth-note {
-    @apply text-[11px] text-white/45 leading-snug flex-1 min-w-0;
+    @apply text-[11px] text-white/65 leading-snug flex-1 min-w-0;
 }
 
 .comment-submit {
@@ -461,7 +461,7 @@ body.player-open {
 }
 
 .comment-action-btn {
-    @apply h-6 px-2 rounded text-[10px] font-medium border-0 bg-transparent text-white/50 transition-all inline-flex items-center justify-center;
+    @apply h-6 px-2 rounded text-[10px] font-medium border-0 bg-transparent text-white/70 transition-all inline-flex items-center justify-center;
 }
 
 .comment-action-btn:hover {
@@ -485,7 +485,7 @@ body.player-open {
 }
 
 .comment-time {
-    @apply text-[10px] text-white/35 shrink-0;
+    @apply text-[10px] text-white/55 shrink-0;
 }
 
 .comment-body {
@@ -593,12 +593,7 @@ body.player-open {
 /* ─── Image Fade-In on Load ─── */
 
 .card-image {
-    opacity: 0;
-    transition: opacity 0.4s ease, transform 0.7s ease;
-}
-
-.card-image.loaded {
-    opacity: 1;
+    transition: transform 0.7s ease;
 }
 
 /* ─── Improved Player Modal Transitions ─── */
@@ -712,6 +707,8 @@ body.player-open {
         aspect-ratio: 16 / 9;
         @apply rounded-2xl;
         flex-shrink: 0;
+        animation: none !important;
+        opacity: 1 !important;
     }
 
     /* Disable scale transforms on mobile */
@@ -818,7 +815,7 @@ body.player-open {
     }
 
     .episodes-track-marker.is-active {
-        animation: markerPulse 1.4s ease-in-out infinite;
+        animation: none;
         border-color: rgba(88, 199, 214, 1);
         box-shadow: 0 0 14px rgba(88, 199, 214, 0.45);
     }

@@ -5,10 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Educheia — Episoade</title>
+    <meta name="description" content="Explorează toate episoadele Educheia: conversații despre educație, oameni și viitor, cu redare video/audio și comentarii.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
+    <link rel="preload" as="style" href="../css/styles.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="../css/styles.css">
+    </noscript>
     <link rel="stylesheet" href="../css/episodes.css">
     <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
 </head>
@@ -20,7 +28,7 @@
                 <picture>
                     <source srcset="../images/logo-dark.webp" media="(prefers-color-scheme: light)">
                     <source srcset="../images/logo-light.webp" media="(prefers-color-scheme: dark)">
-                    <img id="header-logo" src="../images/logo-light.webp" alt="Educheia Logo">
+                    <img id="header-logo" src="../images/logo-light.webp" alt="Educheia Logo" width="220" height="54" decoding="async">
                 </picture>
             </a>
 
@@ -53,9 +61,10 @@
                 
                 <!-- Section Header (Fixed/Parallax) -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 text-center pointer-events-none transition-opacity duration-75" id="section-header">
-                     <h1 class="text-[clamp(4rem,12vw,10rem)] font-bold leading-none text-white/5 select-none whitespace-nowrap">
+                     <h1 class="sr-only">Toate episoadele Educheia</h1>
+                     <p aria-hidden="true" class="text-[clamp(4rem,12vw,10rem)] font-bold leading-none text-white/5 select-none whitespace-nowrap">
                         EPISOADE
-                    </h1>
+                    </p>
                 </div>
 
                 <!-- Controls Layout -->
@@ -99,7 +108,7 @@
         </div>
 
         <!-- Player Modal -->
-        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center p-0 md:pb-3 md:px-3 md:pt-28 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
+        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center p-0 md:pb-3 md:px-3 md:pt-28 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true" inert>
             
             <div id="player-shell" class="relative w-full h-full max-h-full md:w-[98vw] md:max-h-[calc(100vh-9rem)] md:max-w-[1800px] bg-bg-card border-0 md:border md:border-white/10 rounded-none md:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
                 <button id="close-player" class="absolute top-3 right-3 z-50 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
@@ -110,7 +119,7 @@
                     <div id="youtube-player-container" class="w-full aspect-video"></div>
                     <div id="audio-visualizer" class="absolute inset-0 hidden flex-col items-center justify-center gap-6 p-8">
                         <div class="audio-cover-wrap relative w-40 h-40 md:w-56 md:h-56 rounded-3xl border border-primary/30 overflow-hidden shadow-2xl">
-                            <img id="audio-cover" src="../images/logo-light.webp" alt="Copertă episod" class="w-full h-full object-cover">
+                            <img id="audio-cover" src="../images/logo-light.webp" alt="Copertă episod" class="w-full h-full object-cover" width="1280" height="720" loading="lazy" decoding="async">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent"></div>
                         </div>
                         <p class="text-white/80 text-sm tracking-widest uppercase">Audio Mode</p>
@@ -198,7 +207,7 @@
                             <div class="comments-head">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                                    <h3 class="comments-title">Comentarii</h3>
+                                    <h2 class="comments-title">Comentarii</h2>
                                     <span id="comments-count" class="comments-count">0</span>
                                 </div>
                             </div>
@@ -235,7 +244,7 @@
                         <picture>
                             <source srcset="../images/logo-dark.webp" media="(prefers-color-scheme: light)">
                             <source srcset="../images/logo-light.webp" media="(prefers-color-scheme: dark)">
-                            <img src="../images/logo-light.webp" alt="Educheia Logo" class="footer-logo">
+                            <img src="../images/logo-light.webp" alt="Educheia Logo" class="footer-logo" width="260" height="64" loading="lazy" decoding="async">
                         </picture>
                     </a>
                     <p class="footer-tagline">Un podcast curajos despre educație, oameni și viitor.</p>
@@ -243,7 +252,7 @@
 
                 <nav class="footer-nav" aria-label="Footer navigation">
                     <div class="footer-nav-group">
-                        <h4 class="footer-nav-title">Navigare</h4>
+                        <h2 class="footer-nav-title">Navigare</h2>
                         <ul class="footer-nav-list">
                             <li><a href="../index.html" class="footer-link">Acasă</a></li>
                             <li><a href="./episodes.html" class="footer-link">Toate Episoadele</a></li>
@@ -252,7 +261,7 @@
                     </div>
 
                     <div class="footer-nav-group">
-                        <h4 class="footer-nav-title">Cont</h4>
+                        <h2 class="footer-nav-title">Cont</h2>
                         <ul class="footer-nav-list">
                             <li><a href="./login.html" class="footer-link">Login</a></li>
                             <li><a href="./register.html" class="footer-link">Signup</a></li>
@@ -261,7 +270,7 @@
                 </nav>
 
                 <div class="footer-social">
-                    <h4 class="footer-nav-title">Urmărește-ne</h4>
+                    <h2 class="footer-nav-title">Urmărește-ne</h2>
                     <div class="footer-social-links">
                         <a href="https://www.youtube.com/@elenavorotneac" class="footer-social-btn" aria-label="YouTube">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -286,8 +295,15 @@
     </footer>
 
     <script src="../js/script.js"></script>
-    <script type="module" src="../js/account-nav.js"></script>
     <script type="module" src="../js/episodes.js"></script>
+    <script type="module">
+        const loadAccountNav = () => import('../js/account-nav.js').catch(() => null);
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadAccountNav, { timeout: 2000 });
+        } else {
+            window.addEventListener('load', () => setTimeout(loadAccountNav, 700), { once: true });
+        }
+    </script>
 </body>
 
 </html>
