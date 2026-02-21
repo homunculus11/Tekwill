@@ -73,25 +73,73 @@ const renderUserActions = (container, user, options = {}) => {
     const safeInitials = escapeHtml(initials);
     const roleLabel = isAdmin ? 'Admin' : 'Membru';
     const safeRoleLabel = escapeHtml(roleLabel);
-    const roleClassName = isAdmin ? 'account-role account-role-admin' : 'account-role';
+    const roleClassName = isAdmin ? 'dropdown-role dropdown-role-admin' : 'dropdown-role';
+    const accountRoute = getRoute('account');
 
     container.innerHTML = `
-        <a href="${getRoute('account')}" class="account-chip" title="Gestionează contul" aria-label="Deschide pagina contului">
-            <span class="account-avatar" aria-hidden="true">${safeInitials}</span>
-            <span class="account-meta">
-                <span class="account-name">${safeDisplayName}</span>
-                <span class="account-email">${safeEmail}</span>
-                <span class="${roleClassName}">${safeRoleLabel}</span>
-            </span>
-        </a>
-        <button type="button" id="login-btn" class="account-logout" aria-label="Logout">Logout</button>
+        <div class="account-widget" id="account-widget">
+            <button class="account-toggle" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Meniu cont">
+                <span class="account-avatar" aria-hidden="true">${safeInitials}</span>
+                <span class="account-toggle-name">${safeDisplayName}</span>
+                <svg class="account-chevron" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
+            </button>
+            <div class="account-dropdown" role="menu">
+                <div class="dropdown-user-section">
+                    <span class="dropdown-avatar" aria-hidden="true">${safeInitials}</span>
+                    <div class="dropdown-user-info">
+                        <span class="dropdown-name">${safeDisplayName}</span>
+                        <span class="dropdown-email">${safeEmail}</span>
+                        <span class="${roleClassName}">${safeRoleLabel}</span>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-actions">
+                    <a href="${accountRoute}" class="dropdown-item" role="menuitem">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                        Contul meu
+                    </a>
+                    <button type="button" class="dropdown-item dropdown-item-logout" role="menuitem" id="nav-logout-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                        Deconectare
+                    </button>
+                </div>
+            </div>
+        </div>
     `;
 
     container.setAttribute('data-auth-state', 'authenticated');
 
-    const logoutBtn = container.querySelector('.account-logout');
+    const widget = container.querySelector('#account-widget');
+    const toggle = widget?.querySelector('.account-toggle');
+
+    const closeDropdown = () => {
+        widget?.classList.remove('open');
+        toggle?.setAttribute('aria-expanded', 'false');
+    };
+
+    toggle?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = widget.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', (e) => {
+        if (widget && !widget.contains(e.target)) closeDropdown();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeDropdown();
+            toggle?.focus();
+        }
+    });
+
+    const logoutBtn = container.querySelector('#nav-logout-btn');
     logoutBtn?.addEventListener('click', async () => {
         logoutBtn.disabled = true;
+        const originalHTML = logoutBtn.innerHTML;
         logoutBtn.textContent = 'Se deconectează...';
 
         try {
@@ -101,7 +149,7 @@ const renderUserActions = (container, user, options = {}) => {
         } catch (error) {
             console.error('Logout failed', error);
             logoutBtn.disabled = false;
-            logoutBtn.textContent = 'Logout';
+            logoutBtn.innerHTML = originalHTML;
             alert('Nu am putut face logout. Încearcă din nou.');
         }
     });

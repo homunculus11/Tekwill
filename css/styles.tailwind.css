@@ -76,7 +76,7 @@
 
 @layer components {
   .site-header {
-    @apply sticky top-0 z-20 flex h-20 items-center justify-between gap-4 border border-border px-6 text-text-main shadow-[0_10px_28px_rgba(0,0,0,0.08)] backdrop-blur-[10px];
+    @apply sticky top-0 z-20 flex h-20 items-center justify-between gap-4 border border-border px-6 text-text-main shadow-[0_10px_28px_rgba(0,0,0,0.08)];
     background: linear-gradient(120deg, var(--color-bg-card) 0%, var(--color-bg-section) 52%, rgba(0, 140, 156, 0.12) 100%);
   }
 
@@ -120,50 +120,120 @@
     @apply pointer-events-none opacity-0;
   }
 
-  .account-chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-border bg-bg-card px-2 py-1 no-underline transition-all duration-200;
-    opacity: 0.95;
+  /* ── Account Widget (popover pattern) ── */
+  .account-widget {
+    @apply relative;
   }
 
-  .account-chip:hover {
+  .account-toggle {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-border py-[5px] pr-3 pl-[5px] text-text-main transition-all duration-200;
+    background: rgba(23, 34, 56, 0.5);
+    font: inherit;
+  }
+
+  .account-toggle:hover {
     @apply -translate-y-px border-primary;
+    background: rgba(23, 34, 56, 0.7);
+  }
+
+  .account-toggle:focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-primary-soft;
   }
 
   .account-avatar {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-xs font-bold tracking-wide text-primary;
+    @apply inline-flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full bg-primary-soft text-[13px] font-bold tracking-wide text-primary;
   }
 
-  .account-meta {
-    @apply flex min-w-0 flex-col pr-2;
+  .account-toggle-name {
+    @apply max-w-[120px] truncate text-[0.9rem] font-semibold text-text-main;
   }
 
-  .account-name {
-    @apply max-w-[180px] truncate text-sm font-semibold leading-tight text-text-main;
+  .account-chevron {
+    @apply h-4 w-4 flex-shrink-0 text-text-muted transition-transform duration-200;
   }
 
-  .account-email {
-    @apply max-w-[180px] truncate text-xs leading-tight text-text-muted;
+  .account-widget.open .account-chevron {
+    @apply rotate-180;
   }
 
-  .account-role {
-    @apply mt-0.5 inline-flex w-fit items-center rounded-full border border-border bg-bg-section px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted;
+  .account-dropdown {
+    @apply pointer-events-none absolute right-0 z-50 min-w-[260px] overflow-hidden rounded-2xl border p-0 opacity-0;
+    top: calc(100% + 8px);
+    background: linear-gradient(165deg, rgba(25, 36, 58, 0.98), rgba(19, 29, 48, 0.98));
+    border-color: rgba(139, 161, 194, 0.24);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(16px);
+    transform: translateY(-8px) scale(0.96);
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
-  .account-role-admin {
+  .account-widget.open .account-dropdown {
+    @apply pointer-events-auto opacity-100;
+    transform: translateY(0) scale(1);
+  }
+
+  .dropdown-user-section {
+    @apply flex items-center gap-3 p-4;
+  }
+
+  .dropdown-avatar {
+    @apply inline-flex h-[42px] w-[42px] flex-shrink-0 items-center justify-center rounded-full bg-primary-soft text-[15px] font-bold text-primary;
+  }
+
+  .dropdown-user-info {
+    @apply flex min-w-0 flex-col gap-0.5;
+  }
+
+  .dropdown-name {
+    @apply truncate text-[0.95rem] font-semibold text-text-main;
+  }
+
+  .dropdown-email {
+    @apply truncate text-[0.8rem] text-text-muted;
+  }
+
+  .dropdown-role {
+    @apply mt-0.5 inline-flex w-fit items-center rounded-full border border-border bg-bg-section px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted;
+  }
+
+  .dropdown-role-admin {
     @apply border-primary bg-primary-soft text-primary;
   }
 
-  .account-logout {
-    @apply cursor-pointer rounded-xl border-[1.5px] border-primary bg-transparent px-4 py-[9px] text-sm font-semibold tracking-[0.2px] text-primary transition-all duration-200;
+  .dropdown-divider {
+    @apply mx-0 my-0 h-px;
+    background: linear-gradient(90deg, transparent, rgba(139, 161, 194, 0.2), transparent);
   }
 
-  .account-logout:hover {
-    @apply -translate-y-px text-primary shadow-sm;
-    background-color: #13213a;
+  .dropdown-actions {
+    @apply flex flex-col gap-0.5 px-2 py-[6px];
   }
 
-  .account-logout:disabled {
-    @apply cursor-not-allowed opacity-70;
+  .dropdown-item {
+    @apply flex w-full cursor-pointer items-center gap-[10px] rounded-[10px] border-0 bg-transparent px-3 py-[10px] text-left text-[0.88rem] font-medium text-text-secondary no-underline transition-all duration-150;
+    font: inherit;
+  }
+
+  .dropdown-item:hover {
+    @apply text-text-main;
+    background: rgba(109, 186, 198, 0.12);
+  }
+
+  .dropdown-item svg {
+    @apply h-[18px] w-[18px] flex-shrink-0 opacity-60;
+  }
+
+  .dropdown-item:hover svg {
+    @apply opacity-100;
+  }
+
+  .dropdown-item-logout {
+    color: #f07070;
+  }
+
+  .dropdown-item-logout:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
   }
 
   .menu-toggle {
@@ -222,11 +292,17 @@
   }
 
   .header-overlay {
-    @apply fixed inset-0 z-10 hidden bg-black/40 backdrop-blur-[2px];
+    @apply fixed inset-0 z-10 pointer-events-none;
+    opacity: 0;
+    background: rgba(10, 14, 24, 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    transition: opacity 0.3s ease;
   }
 
   body.nav-open .header-overlay {
-    @apply block;
+    @apply pointer-events-auto;
+    opacity: 1;
   }
 
   /* ── Footer ── */
@@ -365,14 +441,12 @@
     }
 
     .header-btns[data-auth-state='authenticated'] {
-      @apply grid-cols-1;
+      @apply block;
     }
 
     .header-btns a,
     #login-btn,
-    #signup-btn,
-    .account-logout,
-    .account-chip {
+    #signup-btn {
       @apply w-full text-center;
     }
 
@@ -380,13 +454,20 @@
       @apply hidden;
     }
 
-    .account-chip {
-      @apply justify-start px-2.5;
+    .account-widget {
+      @apply w-full;
     }
 
-    .account-name,
-    .account-email {
-      @apply max-w-none;
+    .account-toggle {
+      @apply hidden;
+    }
+
+    .account-dropdown {
+      @apply pointer-events-auto static block min-w-0 w-full opacity-100 shadow-none;
+      transform: none;
+      border-color: rgba(139, 161, 194, 0.16);
+      background: rgba(23, 34, 56, 0.4);
+      backdrop-filter: none;
     }
 
     .footer-inner {
@@ -646,7 +727,8 @@
     top: 84px;
     border-radius: 20px;
     border-color: rgba(139, 161, 194, 0.3);
-    background: linear-gradient(165deg, rgba(25, 36, 58, 0.96), rgba(19, 29, 48, 0.96));
+    background: linear-gradient(165deg, rgba(25, 36, 58, 0.88), rgba(19, 29, 48, 0.88));
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 }
 
