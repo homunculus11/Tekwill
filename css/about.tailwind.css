@@ -345,8 +345,12 @@ h4 {
 	@apply pb-24 pt-10;
 }
 
+.about-cta > .about-wrap {
+	@apply px-[clamp(16px,3vw,40px)];
+}
+
 .cta-wrap {
-	@apply border border-white/15 bg-[linear-gradient(135deg,rgba(28,46,73,0.88),rgba(17,29,47,0.98))] px-[clamp(20px,4vw,42px)] py-[clamp(24px,4vw,38px)] text-center shadow-[0_18px_40px_rgba(3,8,16,0.42)];
+	@apply mx-auto max-w-[860px] border border-white/15 bg-[linear-gradient(135deg,rgba(28,46,73,0.88),rgba(17,29,47,0.98))] px-[clamp(24px,5vw,52px)] py-[clamp(28px,4.5vw,44px)] text-center shadow-[0_18px_40px_rgba(3,8,16,0.42)];
 	border-radius: 28px;
 }
 
@@ -407,7 +411,9 @@ h4 {
 	transition: opacity 0.3s ease;
 }
 
-/* ── Responsive ── */
+/* ══════════════════════════════════════════
+   Responsive — Tablet  (≤ 960px)
+   ══════════════════════════════════════════ */
 @media (max-width: 960px) {
 	.about-wrap {
 		@apply px-5;
@@ -418,11 +424,19 @@ h4 {
 	}
 
 	.split {
-		@apply grid-cols-1;
+		@apply grid-cols-1 gap-10;
 	}
 
 	.split.reverse {
 		direction: ltr;
+	}
+
+	.split-visual {
+		@apply order-2;
+	}
+
+	.split-copy {
+		@apply order-1;
 	}
 
 	.story-panel {
@@ -431,6 +445,11 @@ h4 {
 
 	.host-photo {
 		@apply max-w-[320px];
+	}
+
+	.host-photo-wrap,
+	.host-photo {
+		border-radius: 22px;
 	}
 
 	.timeline-step {
@@ -444,47 +463,503 @@ h4 {
 	.timeline-step::before {
 		@apply -left-[28px];
 	}
+
+	.hero-quick-grid {
+		@apply grid-cols-[repeat(2,1fr)];
+	}
+
+	.value-cards {
+		@apply grid-cols-[repeat(2,1fr)];
+	}
+
+	.impact-grid {
+		@apply grid-cols-[repeat(2,1fr)];
+	}
+
+	.cta-wrap {
+		border-radius: 22px;
+	}
 }
 
+/* ══════════════════════════════════════════
+   Responsive — Large mobile  (≤ 768px)
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+	.about-hero {
+		@apply pb-14 pt-[78px];
+	}
+
+	.about-hero h1 {
+		@apply text-[clamp(1.9rem,7vw,2.8rem)];
+	}
+
+	.hero-lead {
+		@apply text-base;
+	}
+
+	/* Quick cards → single column, icon-left / text-right grid */
+	.hero-quick-grid {
+		@apply grid-cols-1 gap-3;
+	}
+
+	.quick-card {
+		@apply grid gap-x-3 gap-y-0 px-4 py-4;
+		grid-template-columns: 40px 1fr;
+		grid-template-rows: auto auto;
+		border-radius: 16px;
+	}
+
+	.quick-card .card-icon {
+		@apply mb-0 self-start;
+		grid-row: 1 / -1;
+	}
+
+	.quick-card h3 {
+		@apply text-[15px] leading-snug;
+	}
+
+	.quick-card p {
+		@apply mt-1 text-[13px] leading-relaxed;
+	}
+
+	.host-photo {
+		@apply mx-auto max-w-[280px];
+	}
+
+	.split-copy h2,
+	.about-wrap > h2,
+	.timeline-title {
+		@apply text-[clamp(1.5rem,5vw,2.2rem)];
+	}
+
+	.timeline-step h3 {
+		@apply text-lg;
+	}
+
+	.timeline-step p {
+		@apply text-sm;
+	}
+
+	/* Impact: 2-col grid with equal sizing */
+	.impact-grid {
+		@apply grid-cols-2 gap-3;
+	}
+
+	.impact-card {
+		@apply flex flex-col items-center justify-center px-4 py-5;
+		border-radius: 16px;
+	}
+
+	.impact-value {
+		@apply text-[1.6rem];
+	}
+
+	.impact-label {
+		@apply mt-1 text-center text-[13px] leading-tight;
+	}
+
+	/* Value cards: 2-col, vertical stacking inside each card */
+	.value-cards {
+		@apply grid-cols-2 gap-3;
+	}
+
+	.value-card {
+		@apply flex flex-col px-4 py-5;
+		border-radius: 16px;
+	}
+
+	.value-number {
+		@apply mb-1 text-[1.8rem];
+	}
+
+	.value-card h3 {
+		@apply text-base;
+	}
+
+	.value-card p {
+		@apply mt-1 flex-1 text-[13px] leading-relaxed;
+	}
+
+	/* Quote */
+	.featured-quote p {
+		@apply text-[clamp(1.2rem,3.5vw,1.8rem)];
+	}
+
+	.featured-quote::before {
+		@apply text-[5rem];
+	}
+
+	/* CTA */
+	.cta-wrap {
+		@apply px-5 py-7;
+		border-radius: 20px;
+	}
+
+	.cta-wrap h2 {
+		@apply text-[clamp(1.4rem,5vw,2rem)];
+	}
+
+	.cta-wrap p {
+		@apply text-sm;
+	}
+}
+
+/* ══════════════════════════════════════════
+   Responsive — Mobile  (≤ 640px)
+   ══════════════════════════════════════════ */
 @media (max-width: 640px) {
 	.about-wrap {
 		@apply px-4;
 	}
 
+	.about-section {
+		@apply py-12;
+	}
+
 	.about-hero {
-		@apply pb-12 pt-[72px];
+		@apply pb-10 pt-[72px];
 	}
 
-	.hero-quick-grid,
-	.value-cards,
-	.impact-grid {
-		@apply grid-cols-1;
+	.about-hero h1 {
+		@apply mt-4 text-[clamp(1.75rem,8vw,2.4rem)];
 	}
 
-	.quick-card,
-	.value-card,
-	.impact-card {
-		border-radius: 16px;
+	.hero-lead {
+		@apply mt-4 text-[15px] leading-[1.6];
+	}
+
+	.hero-kicker {
+		@apply px-3 py-[6px] text-[11px];
+	}
+
+	.hero-scroll-link {
+		@apply mt-6 w-full justify-center py-3 text-sm;
+	}
+
+	/* Quick cards: keep grid layout, refine spacing */
+	.hero-quick-grid {
+		@apply grid-cols-1 gap-3;
+	}
+
+	.quick-card {
+		@apply gap-x-3 px-4 py-[14px];
+		grid-template-columns: 40px 1fr;
+		border-radius: 14px;
+	}
+
+	/* Host */
+	.host-section {
+		@apply py-16;
 	}
 
 	.host-photo {
 		@apply max-w-full;
 	}
 
+	.host-photo-wrap,
+	.host-photo {
+		border-radius: 18px;
+	}
+
+	.host-links {
+		@apply mt-5 gap-2;
+	}
+
+	.host-social {
+		@apply px-3 py-[7px] text-[13px];
+	}
+
+	/* Story panel */
+	.story-panel {
+		@apply px-4 py-5;
+		border-radius: 16px;
+	}
+
+	.story-panel h3 {
+		@apply text-base;
+	}
+
+	.story-panel li {
+		@apply text-[13px];
+	}
+
+	/* Quote */
+	.quote-section {
+		@apply py-10;
+	}
+
+	.featured-quote {
+		@apply py-6;
+	}
+
+	.featured-quote p {
+		@apply text-lg leading-[1.35];
+	}
+
+	.featured-quote cite {
+		@apply mt-4 text-xs;
+	}
+
+	.featured-quote::before {
+		@apply -top-2 text-[4rem];
+	}
+
+	/* Timeline */
+	.timeline-area {
+		@apply py-8;
+	}
+
+	.timeline {
+		@apply mt-6 gap-3;
+	}
+
 	.timeline-step {
-		@apply px-4 py-[18px];
+		@apply ml-9 px-4 py-4;
+		border-radius: 14px;
+	}
+
+	.timeline-step .year {
+		@apply text-[11px];
+	}
+
+	.timeline-step h3 {
+		@apply text-base;
+	}
+
+	.timeline-step p {
+		@apply text-[13px] leading-[1.55];
+	}
+
+	/* Impact: 2-col with consistent center alignment */
+	.impact-grid {
+		@apply grid-cols-2 gap-3;
+	}
+
+	.impact-card {
+		@apply flex flex-col items-center justify-center px-3 py-4;
+		border-radius: 14px;
+		min-height: 100px;
+	}
+
+	.impact-value {
+		@apply text-[1.4rem];
+	}
+
+	.impact-label {
+		@apply mt-1 text-center text-xs leading-tight;
+	}
+
+	/* Values: single column, icon-left / text-right grid */
+	.value-cards {
+		@apply grid-cols-1 gap-3;
+	}
+
+	.value-card {
+		@apply grid gap-x-3 gap-y-0 px-4 py-4;
+		grid-template-columns: 44px 1fr;
+		grid-template-rows: auto auto;
+		border-radius: 14px;
+	}
+
+	.value-number {
+		@apply mb-0 self-start text-[1.8rem] leading-none;
+		grid-row: 1 / -1;
+		padding-top: 2px;
+	}
+
+	.value-card h3 {
+		@apply text-[15px] leading-snug;
+	}
+
+	.value-card p {
+		@apply mt-1 text-[13px] leading-relaxed;
+	}
+
+	/* CTA */
+	.about-cta {
+		@apply pb-16 pt-6;
+	}
+
+	.cta-wrap {
+		@apply px-4 py-6;
+		border-radius: 16px;
+		width: calc(100% - 18px);
 	}
 
 	.cta-actions {
-		@apply flex-col;
+		@apply mt-5 flex-col gap-2;
 	}
 
 	.cta-primary,
 	.cta-secondary {
-		@apply w-full;
+		@apply w-full py-3 text-[15px];
 	}
 
-	.featured-quote p {
+	/* Reduce parallax bg layers on mobile for perf */
+	.hero-bg-layer {
+		@apply opacity-40;
+	}
+
+	.layer-one {
+		@apply -left-20 top-10 h-[260px] w-[260px];
+	}
+
+	.layer-two {
+		@apply -right-20 top-5 h-[300px] w-[300px];
+	}
+
+	/* Tilt: disable for touch devices */
+	.tilt-glow {
+		@apply hidden;
+	}
+}
+
+/* ══════════════════════════════════════════
+   Responsive — Small mobile  (≤ 420px)
+   ══════════════════════════════════════════ */
+@media (max-width: 420px) {
+	.about-wrap {
+		@apply px-3;
+	}
+
+	.about-hero h1 {
+		@apply text-[1.65rem] leading-[1.02];
+	}
+
+	.hero-lead {
+		@apply text-sm;
+	}
+
+	/* Quick cards: tighter grid */
+	.quick-card {
+		@apply gap-x-[10px] px-3 py-3;
+		grid-template-columns: 36px 1fr;
+		border-radius: 12px;
+	}
+
+	.card-icon {
+		@apply h-9 w-9 rounded-lg;
+	}
+
+	.card-icon svg {
+		@apply h-4 w-4;
+	}
+
+	.quick-card h3 {
+		@apply text-sm;
+	}
+
+	.quick-card p {
+		@apply text-xs;
+	}
+
+	/* Headings */
+	.split-copy h2,
+	.about-wrap > h2,
+	.timeline-title {
+		@apply text-[1.35rem];
+	}
+
+	/* Host */
+	.host-social {
+		@apply gap-[6px] px-[10px] py-[6px] text-xs;
+	}
+
+	.host-social svg {
+		@apply h-[14px] w-[14px];
+	}
+
+	/* Timeline */
+	.timeline-step {
+		@apply ml-8 px-3 py-3;
+	}
+
+	.timeline-line {
+		@apply left-[14px];
+	}
+
+	.timeline-step::before {
+		@apply -left-[26px] h-3 w-3;
+	}
+
+	.timeline-step.is-active::before {
+		box-shadow: 0 0 0 5px rgba(109, 186, 198, 0.22);
+	}
+
+	/* Impact: compact 2-col */
+	.impact-card {
+		@apply px-2 py-3;
+		min-height: 88px;
+	}
+
+	.impact-value {
 		@apply text-xl;
+	}
+
+	.impact-label {
+		@apply text-[11px];
+	}
+
+	/* Value cards: tighter grid */
+	.value-card {
+		@apply gap-x-[10px] px-3 py-3;
+		grid-template-columns: 38px 1fr;
+		border-radius: 12px;
+	}
+
+	.value-number {
+		@apply text-[1.5rem];
+	}
+
+	.value-card h3 {
+		@apply text-sm;
+	}
+
+	.value-card p {
+		@apply text-xs;
+	}
+
+	/* CTA */
+	.cta-wrap {
+		@apply px-3 py-5;
+		border-radius: 14px;
+		width: calc(100% - 12px);
+	}
+
+	.cta-wrap h2 {
+		@apply text-[1.25rem];
+	}
+
+	.cta-wrap p {
+		@apply text-[13px];
+	}
+
+	.cta-primary,
+	.cta-secondary {
+		@apply text-sm;
+	}
+
+	/* Quote */
+	.featured-quote p {
+		@apply text-base;
+	}
+
+	.featured-quote::before {
+		@apply text-[3rem];
+	}
+
+	/* Story panel */
+	.story-panel {
+		@apply px-3 py-4;
+		border-radius: 12px;
+	}
+
+	.story-panel li {
+		@apply pl-4 text-xs;
+	}
+
+	.story-panel li::before {
+		@apply top-[6px] h-[5px] w-[5px];
+		box-shadow: 0 0 0 4px rgba(109, 186, 198, 0.2);
 	}
 }
