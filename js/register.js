@@ -12,7 +12,74 @@ import {
 
 const USERNAME_EMAIL_MAP_KEY = 'usernameEmailMap';
 const googleProvider = new GoogleAuthProvider();
-const REDIRECT_PATH = './episodes.html';
+const DEFAULT_REDIRECT_PATH = './episodes.html';
+const AUTH_RETURN_KEY = 'authReturnTo';
+
+const isAuthPath = (path) => /\/((src\/)?)(login|register)\.html$/i.test(String(path || ''));
+
+const isSafeRedirect = (target) => {
+    if (!target) return false;
+
+    try {
+        const parsed = new URL(target, window.location.origin);
+        return parsed.origin === window.location.origin && !isAuthPath(parsed.pathname);
+    } catch {
+        return false;
+    }
+};
+
+const readReturnTarget = () => {
+    try {
+        const value = sessionStorage.getItem(AUTH_RETURN_KEY);
+        return isSafeRedirect(value) ? value : null;
+    } catch {
+        return null;
+    }
+};
+
+const writeReturnTarget = (value) => {
+    if (!isSafeRedirect(value)) return;
+
+    try {
+        sessionStorage.setItem(AUTH_RETURN_KEY, value);
+    } catch {
+        return;
+    }
+};
+
+const clearReturnTarget = () => {
+    try {
+        sessionStorage.removeItem(AUTH_RETURN_KEY);
+    } catch {
+        return;
+    }
+};
+
+const getRedirectTarget = () => {
+    const params = new URLSearchParams(window.location.search);
+    const queryTarget = params.get('redirect');
+
+    if (isSafeRedirect(queryTarget)) {
+        writeReturnTarget(queryTarget);
+        return queryTarget;
+    }
+
+    const storedTarget = readReturnTarget();
+    if (storedTarget) return storedTarget;
+
+    if (isSafeRedirect(document.referrer)) {
+        writeReturnTarget(document.referrer);
+        return document.referrer;
+    }
+
+    return DEFAULT_REDIRECT_PATH;
+};
+
+const redirectAfterAuth = () => {
+    const target = getRedirectTarget();
+    clearReturnTarget();
+    window.location.href = target;
+};
 
 const persistUsernameAlias = (username, email) => {
     if (!username || !email) return;
@@ -73,7 +140,7 @@ try {
     const redirectResult = await getRedirectResult(auth);
     if (redirectResult?.user) {
         persistUsernameAlias(redirectResult.user.displayName, redirectResult.user.email);
-        window.location.href = REDIRECT_PATH;
+        redirectAfterAuth();
     }
 } catch (err) {
     console.error('Google redirect signup error', err);
@@ -83,7 +150,7 @@ try {
 // redirect if already logged in
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        window.location.href = REDIRECT_PATH;
+        redirectAfterAuth();
     }
 });
 
@@ -108,7 +175,7 @@ if (registerForm) {
             await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(auth.currentUser, { displayName: username });
             persistUsernameAlias(username, email);
-            window.location.href = REDIRECT_PATH;
+            redirectAfterAuth();
         } catch (err) {
             console.error('Signup error', err);
             alert(getFriendlyAuthError(err));
@@ -131,10 +198,11 @@ if (googleRegisterButton) {
             setPendingState(googleRegisterButton, true, 'Connecting...');
             const result = await signInWithPopup(auth, googleProvider);
             persistUsernameAlias(result.user.displayName, result.user.email);
-            window.location.href = REDIRECT_PATH;
+            redirectAfterAuth();
         } catch (err) {
             if (shouldFallbackToRedirect(err)) {
                 try {
+                    writeReturnTarget(getRedirectTarget());
                     await signInWithRedirect(auth, googleProvider);
                     return;
                 } catch (redirectErr) {

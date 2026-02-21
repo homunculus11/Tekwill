@@ -66,6 +66,98 @@ const writeSessionValue = (key, value) => {
 	}
 };
 
+const AUTH_RETURN_KEY = 'authReturnTo';
+
+const isAuthPath = (path) => /\/((src\/)?)(login|register)\.html$/i.test(String(path || ''));
+
+const isSafeReturnPath = (target) => {
+	if (!target) return false;
+
+	try {
+		const parsed = new URL(target, window.location.origin);
+		if (parsed.origin !== window.location.origin) return false;
+		if (isAuthPath(parsed.pathname)) return false;
+		return true;
+	} catch {
+		return false;
+	}
+};
+
+const readAuthReturnPath = () => {
+	const value = readSessionValue(AUTH_RETURN_KEY);
+	return isSafeReturnPath(value) ? value : null;
+};
+
+const writeAuthReturnPath = (value) => {
+	if (!isSafeReturnPath(value)) return;
+	writeSessionValue(AUTH_RETURN_KEY, value);
+};
+
+const getCurrentRelativeUrl = () => `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+const decorateAuthLinksWithRedirect = () => {
+	const isOnAuthPage = isAuthPath(window.location.pathname);
+	const currentUrl = getCurrentRelativeUrl();
+	const search = new URLSearchParams(window.location.search);
+	const queryRedirect = search.get('redirect');
+
+	if (!isOnAuthPage) {
+		writeAuthReturnPath(currentUrl);
+	} else if (isSafeReturnPath(queryRedirect)) {
+		writeAuthReturnPath(queryRedirect);
+	}
+
+	const storedRedirect = readAuthReturnPath();
+	const redirectTarget = isOnAuthPage
+		? (isSafeReturnPath(queryRedirect) ? queryRedirect : storedRedirect)
+		: currentUrl;
+
+	if (!isSafeReturnPath(redirectTarget)) return;
+
+	const links = document.querySelectorAll('a[href]');
+	links.forEach((link) => {
+		const rawHref = link.getAttribute('href');
+		if (!rawHref) return;
+
+		let parsedHref;
+		try {
+			parsedHref = new URL(rawHref, window.location.href);
+		} catch {
+			return;
+		}
+
+		if (!isAuthPath(parsedHref.pathname)) return;
+
+		parsedHref.searchParams.set('redirect', redirectTarget);
+		const nextHref = `${parsedHref.pathname}${parsedHref.search}${parsedHref.hash}`;
+		if (rawHref !== nextHref) {
+			link.setAttribute('href', nextHref);
+		}
+	});
+};
+
+decorateAuthLinksWithRedirect();
+
+const authLinksObserver = new MutationObserver((mutations) => {
+	const hasRelevantMutation = mutations.some((mutation) => {
+		if (mutation.type === 'childList') {
+			return Array.from(mutation.addedNodes).some((node) => node instanceof Element);
+		}
+		return mutation.type === 'attributes' && mutation.attributeName === 'href';
+	});
+
+	if (hasRelevantMutation) {
+		decorateAuthLinksWithRedirect();
+	}
+});
+
+authLinksObserver.observe(document.body, {
+	childList: true,
+	subtree: true,
+	attributes: true,
+	attributeFilter: ['href']
+});
+
 const readSessionNumber = (key, fallback = null) => {
 	const value = readSessionValue(key);
 	if (value === null) return fallback;
