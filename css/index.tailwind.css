@@ -197,6 +197,10 @@ h4 {
     filter: saturate(1.05) contrast(1.02);
   }
 
+  .hero-photo picture {
+    @apply relative z-[1] block h-full w-full;
+  }
+
   .floating-card {
     @apply absolute bottom-[22px] left-[-18px] z-[4] w-[240px] border border-border bg-slate-900/70 px-4 pb-[14px] pt-[14px] text-text-main shadow-[0_16px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl;
     border-radius: 18px 14px 16px 20px;
@@ -1242,27 +1246,24 @@ main {
   border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(105deg, transparent 42%, rgba(142, 208, 217, 0.06) 46%, rgba(167, 182, 240, 0.04) 50%, transparent 54%);
-  background-size: 300% 100%;
-  background-position: 100% 0;
-  transition: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
 }
 
 .listen-card[data-scroll-reveal].sheen-active::after {
-  background-position: -100% 0;
-  transition: background-position 0.8s ease;
+  opacity: 1;
 }
 
 /* ── Metric Glow Burst ── */
 
 @keyframes metric-glow-burst {
   0%, 100% {
-    box-shadow: 0 14px 32px rgba(4, 10, 20, 0.34);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
   40% {
-    box-shadow:
-      0 14px 32px rgba(4, 10, 20, 0.34),
-      0 0 60px rgba(109, 186, 198, 0.24),
-      inset 0 0 30px rgba(109, 186, 198, 0.05);
+    opacity: 0.96;
+    transform: translateY(-1px) scale(1.006);
   }
 }
 
@@ -1273,7 +1274,7 @@ main {
 /* ── Final CTA Snap ── */
 
 .final-cta-card {
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .final-cta-card.snap-focus {

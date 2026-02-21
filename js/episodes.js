@@ -282,7 +282,7 @@ const renderCards = () => {
 
     episodes.forEach((ep, index) => {
         // Thumbnail logic
-        let imageUrl = '../images/logo-light.png';
+        let imageUrl = '../images/logo-light.webp';
         if (ep.thumbnails) {
             imageUrl = ep.thumbnails.maxres?.url || ep.thumbnails.high?.url || ep.thumbnails.medium?.url;
         } else if (ep.videoId) {
@@ -660,7 +660,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
-const sanitizeImageUrl = (url, fallback = '../images/logo-light.png') => {
+const sanitizeImageUrl = (url, fallback = '../images/logo-light.webp') => {
     if (typeof url !== 'string' || !url.trim()) return fallback;
 
     try {
@@ -1479,7 +1479,7 @@ const openPlayer = (episode) => {
     const episodeCover = episode.thumbnails?.maxres?.url
         || episode.thumbnails?.high?.url
         || episode.thumbnails?.medium?.url
-        || (episode.videoId ? `https://img.youtube.com/vi/${episode.videoId}/hqdefault.jpg` : '../images/logo-light.png');
+        || (episode.videoId ? `https://img.youtube.com/vi/${episode.videoId}/hqdefault.jpg` : '../images/logo-light.webp');
     const coverEl = document.getElementById('audio-cover');
     if (coverEl) {
         coverEl.src = episodeCover;

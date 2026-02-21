@@ -349,7 +349,10 @@ const renderRecentGuests = (items) => {
 			image.className = 'guest-image';
 			image.src = guest.image;
 			image.alt = `Invitat: ${guest.name}`;
+			image.width = 640;
+			image.height = 360;
 			image.loading = 'lazy';
+			image.decoding = 'async';
 			media.appendChild(image);
 		}
 
@@ -502,7 +505,7 @@ getEpisodes()
 		}
 	})
 	.catch((error) => {
-		console.error('Error loading episodes:', error);
+		console.warn('Error loading episodes:', error);
 		const episodeCountElement = document.getElementById('nr-of-episodes');
 		const guestCountElement = document.getElementById('nr-of-guests');
 
@@ -569,6 +572,10 @@ const fillEpisodeCards = async (data) => {
 
 		const playBtn = card.querySelector(`#play-btn-${currentEpisodeNumber}`);
 		if (playBtn) {
+			const episodeTitle = item.snippet?.title
+				? (extractEpisodeTopic(item.snippet.title) || `episodul ${currentEpisodeNumber}`)
+				: `episodul ${currentEpisodeNumber}`;
+			playBtn.setAttribute('aria-label', `Redă ${episodeTitle}`);
 			playBtn.addEventListener('click', () => redirectToEpisode(item.contentDetails.videoId));
 		}
 
@@ -904,7 +911,7 @@ getChannelStats()
 		}
 	})
 	.catch((error) => {
-		console.error('Error loading channel stats:', error);
+		console.warn('Error loading channel stats:', error);
 		const listenersElement = document.getElementById('nr-of-listeners');
 		setMetricValue(listenersElement, null);
 	})

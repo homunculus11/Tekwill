@@ -4,10 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Educheia este un podcast despre educație, oameni și viitor cu Elena Vorotneac. Ascultă cele mai noi episoade, invitați și perspective curajoase.">
     <title>Educheia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
+    <link rel="preload" as="image" href="images/hero.webp" fetchpriority="high">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
@@ -18,9 +23,9 @@
         <div class="header-left">
             <a href="./index.html" class="logo-link">
                 <picture>
-                    <source srcset="images/logo-dark.png" media="(prefers-color-scheme: light)">
-                    <source srcset="images/logo-light.png" media="(prefers-color-scheme: dark)">
-                    <img id="header-logo" src="images/logo-light.png" alt="Educheia Logo">
+                    <source srcset="images/logo-dark.webp" media="(prefers-color-scheme: light)">
+                    <source srcset="images/logo-light.webp" media="(prefers-color-scheme: dark)">
+                    <img id="header-logo" src="images/logo-light.webp" alt="Educheia Logo" width="220" height="54" decoding="async">
                 </picture>
             </a>
             
@@ -46,7 +51,7 @@
                 </li>
             </ul>
 
-            <div id="header-btns" class="header-btns auth-pending">
+            <div id="header-btns" class="header-btns">
                 <a href="./src/login.html" id="login-btn">Login</a>
                 <a href="./src/register.html" id="signup-btn">Signup</a>
             </div>
@@ -88,10 +93,10 @@
                     </div>
                 </div>
 
-                <div class="hero-visual" aria-hidden="true">
+                <div class="hero-visual">
                     <div class="hero-photo">
                         <div class="photo-glow"></div>
-                        <img src="images/hero.png" alt="Elena Vorotneac" class="hero-image">
+                        <img src="images/hero.webp" alt="Elena Vorotneac" class="hero-image" width="1118" height="1693" fetchpriority="high" loading="eager" decoding="async">
                         <div class="photo-ring"></div>
                     </div>
 
@@ -105,7 +110,7 @@
                             <span></span><span></span><span></span><span></span><span></span><span></span>
                         </div>
                         <div class="floating-actions">
-                            <button class="btn btn-mini">Play 30s</button>
+                            <button class="btn btn-mini" type="button">Play 30s</button>
                             <span class="floating-note" id="latest-episode-guest">Preview exclusiv</span>
                         </div>
                     </div>
@@ -130,7 +135,7 @@
                     <h3 class="episode-title"></h3>
                     <p class="episode-guest"></p>
                     <p class="episode-date"></p>
-                    <button class="play-btn" id="play-btn-1">
+                    <button class="play-btn" id="play-btn-1" type="button" aria-label="Redă episodul 1">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
                             <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
                         </svg>
@@ -142,7 +147,7 @@
                     <h3 class="episode-title"></h3>
                     <p class="episode-guest"></p>
                     <p class="episode-date"></p>
-                    <button class="play-btn" id="play-btn-2">
+                    <button class="play-btn" id="play-btn-2" type="button" aria-label="Redă episodul 2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
                             <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
                         </svg>
@@ -154,7 +159,7 @@
                     <h3 class="episode-title"></h3>
                     <p class="episode-guest"></p>
                     <p class="episode-date"></p>
-                    <button class="play-btn" id="play-btn-3">
+                    <button class="play-btn" id="play-btn-3" type="button" aria-label="Redă episodul 3">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
                             <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
                         </svg>
@@ -166,7 +171,7 @@
                     <h3 class="episode-title"></h3>
                     <p class="episode-guest"></p>
                     <p class="episode-date"></p>
-                    <button class="play-btn" id="play-btn-4">
+                    <button class="play-btn" id="play-btn-4" type="button" aria-label="Redă episodul 4">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" focusable="false">
                             <path d="M8.72 6.32a1 1 0 0 0-1.52.85v9.66a1 1 0 0 0 1.52.85l8.04-4.83a1 1 0 0 0 0-1.7L8.72 6.32z"/>
                         </svg>
@@ -272,9 +277,9 @@
                 <div class="footer-brand">
                     <a href="./index.html" class="footer-logo-link">
                         <picture>
-                            <source srcset="images/logo-dark.png" media="(prefers-color-scheme: light)">
-                            <source srcset="images/logo-light.png" media="(prefers-color-scheme: dark)">
-                            <img src="images/logo-light.png" alt="Educheia Logo" class="footer-logo">
+                            <source srcset="images/logo-dark.webp" media="(prefers-color-scheme: light)">
+                            <source srcset="images/logo-light.webp" media="(prefers-color-scheme: dark)">
+                            <img src="images/logo-light.webp" alt="Educheia Logo" class="footer-logo" width="220" height="64" loading="lazy" decoding="async">
                         </picture>
                     </a>
                     <p class="footer-tagline">Un podcast curajos despre educație, oameni și viitor.</p>
@@ -282,7 +287,7 @@
 
                 <nav class="footer-nav" aria-label="Footer navigation">
                     <div class="footer-nav-group">
-                        <h4 class="footer-nav-title">Navigare</h4>
+                        <h3 class="footer-nav-title">Navigare</h3>
                         <ul class="footer-nav-list">
                             <li><a href="./index.html" class="footer-link">Acasă</a></li>
                             <li><a href="./src/episodes.html" class="footer-link">Toate Episoadele</a></li>
@@ -291,7 +296,7 @@
                     </div>
 
                     <div class="footer-nav-group">
-                        <h4 class="footer-nav-title">Cont</h4>
+                        <h3 class="footer-nav-title">Cont</h3>
                         <ul class="footer-nav-list">
                             <li><a href="./src/login.html" class="footer-link">Login</a></li>
                             <li><a href="./src/register.html" class="footer-link">Signup</a></li>
@@ -300,7 +305,7 @@
                 </nav>
 
                 <div class="footer-social">
-                    <h4 class="footer-nav-title">Urmărește-ne</h4>
+                    <h3 class="footer-nav-title">Urmărește-ne</h3>
                     <div class="footer-social-links">
                         <a href="https://www.youtube.com/@elenavorotneac" class="footer-social-btn" aria-label="YouTube">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -325,7 +330,6 @@
     </footer>
 
     <script src="js/script.js"></script>
-    <script type="module" src="js/account-nav.js"></script>
     <script src="js/index.js"></script>
 </body>
 

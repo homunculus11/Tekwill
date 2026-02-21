@@ -219,7 +219,7 @@ const getEpisodes = async () => {
 		writeSessionValue('episodesFetchedAt', fetchedAt.toString());
 		writeSessionValue('numberOfEpisodes', String(Number.isFinite(data?.numberOfEpisodes) ? data.numberOfEpisodes : 0));
 	} catch (error) {
-		console.error('Error fetching episodes:', error);
+		console.warn('Error fetching episodes:', error);
 	}
 
 	const storedItemsRaw = readSessionJson('episodes', []);
@@ -268,7 +268,7 @@ const getChannelStats = async () => {
 		writeSessionValue('channel', JSON.stringify(channelInfo));
 		writeSessionValue('channelFetchedAt', fetchedAt.toString());
 	} catch (error) {
-		console.error('Error fetching channel:', error);
+		console.warn('Error fetching channel:', error);
 	}
 
 	const storedChannelRaw = readSessionJson('channel', {});
