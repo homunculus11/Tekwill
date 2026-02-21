@@ -48,8 +48,8 @@
     </nav>
 
     <main class="-mt-[100px] relative z-0">
-        <div id="scroll-container" class="relative h-[400vh]">
-            <div class="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center bg-[#0f1524]">
+        <div id="scroll-container" class="relative h-[300vh] md:h-[400vh]">
+            <div id="sticky-wrapper" class="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center bg-[#0f1524]">
                 
                 <!-- Section Header (Fixed/Parallax) -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 text-center pointer-events-none transition-opacity duration-75" id="section-header">
@@ -59,21 +59,22 @@
                 </div>
 
                 <!-- Controls Layout -->
-                <div class="absolute top-24 right-8 z-20 flex gap-4">
+                <div id="episodes-controls" class="absolute top-20 right-3 md:top-24 md:right-8 z-20 flex gap-2 md:gap-4 items-center">
+                    <h2 id="mobile-episodes-title" class="hidden text-lg font-bold text-white flex-1 min-w-0">Episoade</h2>
                      <!-- Sort Button -->
-                    <button id="sort-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md transition-all flex items-center gap-2 group">
+                    <button id="sort-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium backdrop-blur-md transition-all flex items-center gap-1.5 md:gap-2 group">
                         <svg class="w-4 h-4 text-primary group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
                         <span id="sort-label">Cele mai noi</span>
                     </button>
                     <!-- To End/Start Button -->
-                    <button id="scroll-jump-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md transition-all flex items-center gap-2">
+                    <button id="scroll-jump-btn" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium backdrop-blur-md transition-all flex items-center gap-1.5 md:gap-2">
                         <span>Spre final</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                     </button>
                 </div>
 
                 <!-- Horizontal Track -->
-                <div id="horizontal-track" class="flex items-center gap-[5vw] px-[10vw] will-change-transform pt-20 h-full">
+                <div id="horizontal-track" class="flex items-center gap-[5vw] px-[5vw] md:px-[10vw] will-change-transform pt-14 md:pt-20 h-full">
                     <!-- Cards will be injected here via JS -->
                 </div>
                 
@@ -84,12 +85,12 @@
                 <!-- I will interpret this as: The bar should be positioned relative to the CAROUSEL content vertically, not the page center. -->
                 <!-- actually, let's put a progress line AT THE BOTTOM of the screen that fills up. -->
                 
-                <div class="fixed bottom-0 left-0 h-1.5 bg-white/10 w-full z-40">
+                <div id="progress-bar-container" class="fixed bottom-0 left-0 h-1.5 bg-white/10 w-full z-40">
                      <div id="timeline-fill-bottom" class="h-full bg-primary w-0 shadow-[0_0_15px_rgba(88,199,214,0.8)]"></div>
                 </div>
 
                 <!-- Scroll Hint -->
-                <div class="absolute bottom-12 left-1/2 -translate-x-1/2 text-text-muted text-sm flex flex-col items-center gap-2 animate-pulse" id="scroll-hint">
+                <div class="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 text-text-muted text-sm flex flex-col items-center gap-2 animate-pulse" id="scroll-hint">
 
                     <span class="tracking-widest uppercase text-xs font-semibold">Derulează</span>
                     <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
@@ -98,9 +99,9 @@
         </div>
 
         <!-- Player Modal -->
-        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center pb-3 px-3 pt-28 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
+        <div id="player-modal" class="fixed inset-0 z-50 flex items-center justify-center p-0 md:pb-3 md:px-3 md:pt-28 bg-slate-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 scale-95" aria-hidden="true">
             
-            <div id="player-shell" class="relative w-[98vw] h-full max-h-[calc(100vh-9rem)] max-w-[1800px] bg-bg-card border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
+            <div id="player-shell" class="relative w-full h-full max-h-full md:w-[98vw] md:max-h-[calc(100vh-9rem)] md:max-w-[1800px] bg-bg-card border-0 md:border md:border-white/10 rounded-none md:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row transform transition-transform duration-500 scale-100">
                 <button id="close-player" class="absolute top-3 right-3 z-50 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -162,8 +163,8 @@
                 </div>
 
                 <!-- Content/Controls Section -->
-                <div class="w-full lg:w-[32%] flex flex-col border-l border-white/5 bg-slate-900/50 backdrop-blur-md">
-                    <div class="p-5 md:p-6 flex-1 overflow-y-auto player-sidebar">
+                <div class="w-full lg:w-[32%] flex flex-col flex-1 min-h-0 border-t lg:border-t-0 lg:border-l border-white/5 bg-slate-900/50 backdrop-blur-md">
+                    <div class="p-4 md:p-6 flex-1 overflow-y-auto player-sidebar">
                         <!-- Episode Info -->
                         <div class="sidebar-section">
                             <div class="flex items-center gap-2 mb-3">

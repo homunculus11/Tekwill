@@ -279,10 +279,6 @@ body.player-open {
     overflow: auto;
 }
 
-.sidebar-section {
-    /* Handled by parent space-y-4, this is just a structural wrapper */
-}
-
 .player-controls-panel {
     @apply absolute left-1/2 -translate-x-1/2 bottom-3 z-20 w-[min(94%,820px)] p-2.5 rounded-xl border border-white/10 bg-slate-950/80 backdrop-blur-md space-y-2;
 }
@@ -639,4 +635,495 @@ body.player-open {
 
 .episodes-track-progress-fill {
     transition: width 0.15s linear;
+}
+
+@keyframes markerPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1.06);
+        box-shadow: 0 0 0 0 rgba(88, 199, 214, 0.35);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        box-shadow: 0 0 0 8px rgba(88, 199, 214, 0);
+    }
+}
+
+/* ─── Mobile: Vertical Feed Layout ─── */
+/* On mobile, the horizontal scroll-jacking is replaced with a natural
+   vertical card feed. No sticky viewport, no transforms, just scroll. */
+
+@media (max-width: 767px) {
+
+    /* ── Disable scroll-jacking structure ── */
+    #scroll-container {
+        height: auto !important;
+    }
+
+    #sticky-wrapper {
+        position: relative !important;
+        height: auto !important;
+        overflow: visible !important;
+        justify-content: flex-start !important;
+        padding-top: 7rem;
+        background: transparent !important;
+    }
+
+    /* Hide desktop-only decorations */
+    #section-header,
+    #scroll-hint,
+    #progress-bar-container {
+        display: none !important;
+    }
+
+    /* ── Mobile controls bar ── */
+    #episodes-controls {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        width: 100%;
+        @apply flex items-center gap-3 px-4 pt-2 pb-3;
+    }
+
+    #mobile-episodes-title {
+        display: block !important;
+    }
+
+    /* Hide jump button on mobile – natural scrolling is fine */
+    #scroll-jump-btn {
+        display: none !important;
+    }
+
+    /* ── Vertical card track ── */
+    #horizontal-track {
+        position: relative;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.875rem !important;
+        padding: 0 1rem 2rem 2rem !important;
+        transform: none !important;
+        will-change: auto !important;
+        height: auto !important;
+    }
+
+    /* ── Episode cards: compact vertical ── */
+    .episode-card {
+        width: 100% !important;
+        aspect-ratio: 16 / 9;
+        @apply rounded-2xl;
+        flex-shrink: 0;
+    }
+
+    /* Disable scale transforms on mobile */
+    .episode-card.active {
+        transform: none !important;
+        @apply border-border;
+        z-index: 1;
+    }
+
+    .episode-card:hover {
+        transform: none !important;
+        box-shadow: none;
+    }
+
+    /* Compact card content overlay */
+    .card-content {
+        @apply p-3 pb-4;
+        background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.45) 55%, transparent 100%);
+    }
+
+    .episode-title {
+        @apply text-[0.9375rem] font-semibold leading-snug mb-1;
+    }
+
+    .episode-number {
+        @apply text-[10px] px-2 py-0.5 mb-1.5;
+    }
+
+    .episode-meta {
+        @apply text-[0.6875rem] gap-2 mt-1;
+    }
+
+    /* Hide play overlay – card is tappable */
+    .card-play-overlay {
+        display: none !important;
+    }
+
+    /* Always show gradient for text readability */
+    .card-image-wrapper::after {
+        @apply opacity-100;
+    }
+
+    /* Hide audio wave indicators */
+    .audio-wave {
+        display: none !important;
+    }
+
+    /* Vertical progress bar connecting episodes */
+    .episodes-track-progress {
+        display: block !important;
+        position: absolute !important;
+        left: 0.625rem !important;
+        top: 0.5rem !important;
+        bottom: 0.5rem !important;
+        width: 2px !important;
+        height: auto !important;
+        transform: none !important;
+    }
+
+    .episodes-track-progress-line {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .episodes-track-progress-fill {
+        width: 100% !important;
+        height: 0%;
+        transition: height 0.15s linear;
+        box-shadow: 0 0 8px rgba(88, 199, 214, 0.4);
+    }
+
+    .episodes-track-marker {
+        position: absolute;
+        left: 50%;
+        width: 0.72rem;
+        height: 0.72rem;
+        border-radius: 9999px;
+        transform: translate(-50%, -50%) scale(0.9);
+        background: rgba(15, 21, 36, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        box-shadow: 0 0 0 1px rgba(15, 21, 36, 0.45);
+        transition: transform 0.22s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.24s ease;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .episodes-track-marker::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.28);
+        transition: background-color 0.2s ease;
+    }
+
+    .episodes-track-marker.is-passed {
+        border-color: rgba(88, 199, 214, 0.9);
+        background: rgba(22, 51, 66, 0.95);
+        box-shadow: 0 0 10px rgba(88, 199, 214, 0.28);
+    }
+
+    .episodes-track-marker.is-passed::after {
+        background: rgba(88, 199, 214, 0.95);
+    }
+
+    .episodes-track-marker.is-active {
+        animation: markerPulse 1.4s ease-in-out infinite;
+        border-color: rgba(88, 199, 214, 1);
+        box-shadow: 0 0 14px rgba(88, 199, 214, 0.45);
+    }
+
+    /* ── Skeleton cards ── */
+    .skeleton-card {
+        width: 100% !important;
+        @apply rounded-2xl;
+    }
+
+    .skeleton-card-content {
+        @apply p-4;
+    }
+
+    .skeleton-title {
+        @apply h-5 w-2/3;
+    }
+
+    .skeleton-badge {
+        @apply w-16 h-4;
+    }
+
+    .skeleton-meta {
+        @apply h-3 w-28;
+    }
+
+    /* ══════════ Mobile Player Rework ══════════ */
+
+    /* Keep backdrop full-screen, but place card below nav */
+    #player-modal {
+        @apply items-stretch justify-start;
+        inset: 0 !important;
+        padding: 7.5rem 3vw 0 !important;
+    }
+
+    /* Shell: rounded container with gap from edges */
+    #player-shell {
+        @apply flex-col;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 1.25rem !important;
+        width: 100% !important;
+        height: calc(100dvh - 8rem) !important;
+        max-height: calc(100dvh - 8rem) !important;
+        overflow: hidden;
+    }
+
+    /* Video stage – viewport-relative height */
+    #player-stage {
+        @apply flex-shrink-0 relative;
+        height: 28svh;
+        max-height: 28svh;
+    }
+
+    /* Gradient fade from video into sidebar */
+    #player-stage::after {
+        content: '';
+        @apply absolute bottom-0 left-0 right-0 pointer-events-none z-10;
+        height: 3svh;
+        background: linear-gradient(to top, #0d1320, transparent);
+    }
+
+    /* Controls: compact, centered, gradient bg */
+    .player-controls-panel {
+        @apply absolute bottom-0 z-20 border-0;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        padding: 0.4svh 3vw 0.6svh !important;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 50%, transparent);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+    }
+
+    .player-controls-panel > * + * {
+        margin-top: 0.25svh;
+    }
+
+    .player-seek-wrap {
+        @apply space-y-0;
+    }
+
+    .player-time-row {
+        font-size: clamp(9px, 2.5vw, 12px);
+    }
+
+    .player-controls-row {
+        gap: 1.5vw;
+    }
+
+    .player-left-controls,
+    .player-right-controls {
+        gap: 1.5vw;
+    }
+
+    /* Compact buttons */
+    .icon-btn {
+        height: 3.2svh;
+        min-width: 8vw;
+        @apply rounded-lg;
+        font-size: clamp(9px, 2.5vw, 12px);
+    }
+
+    .icon-btn-primary {
+        height: 3.6svh;
+        min-width: 9vw;
+        @apply rounded-lg;
+    }
+
+    #player-mute,
+    #player-speed,
+    #player-fullscreen {
+        height: 3.2svh;
+        @apply rounded-lg;
+    }
+
+    #player-mute {
+        padding-left: 2vw;
+        padding-right: 2vw;
+    }
+
+    #player-speed {
+        padding-left: 1.5vw;
+        padding-right: 5vw;
+        font-size: clamp(9px, 2.5vw, 12px);
+    }
+
+    #player-volume {
+        display: none !important;
+    }
+
+    .player-state-label {
+        display: none !important;
+    }
+
+    /* Seek bar */
+    #player-seek {
+        height: 3px;
+    }
+
+    #player-seek::-webkit-slider-thumb {
+        width: 3.5vw;
+        height: 3.5vw;
+    }
+
+    #player-seek::-moz-range-thumb {
+        width: 3.5vw;
+        height: 3.5vw;
+    }
+
+    /* Close button: prominent, viewport-scaled */
+    #close-player {
+        top: 1.5svh;
+        right: 3vw;
+        @apply z-[60];
+        padding: 2.5vw;
+        background: rgba(0, 0, 0, 0.5) !important;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    #close-player svg {
+        width: 6vw;
+        height: 6vw;
+    }
+
+    /* Sidebar – fills remaining space */
+    #player-shell > div:last-child {
+        @apply flex-1 min-h-0;
+        border-top: 0 !important;
+        background: linear-gradient(180deg, #0d1320, #0f1524);
+    }
+
+    .player-sidebar {
+        padding: 3vw;
+        display: flex;
+        flex-direction: column;
+        gap: 2svh;
+        overflow-y: auto !important;
+        min-height: 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .player-sidebar > * + * {
+        margin-top: 0;
+    }
+
+    /* Episode info – viewport-scaled text */
+    #player-episode-num {
+        font-size: clamp(10px, 2.8vw, 13px);
+        padding: 0.5svh 3vw;
+    }
+
+    #player-date {
+        font-size: clamp(10px, 2.5vw, 12px);
+    }
+
+    #player-title {
+        font-size: clamp(16px, 4.5vw, 22px);
+        line-height: 1.25;
+    }
+
+    /* Mode toggle */
+    #mode-video,
+    #mode-audio {
+        padding: 1.2svh 3vw;
+        font-size: clamp(11px, 3vw, 14px);
+    }
+
+    #audio-visualizer .audio-cover-wrap {
+        width: 28vw;
+        height: 28vw;
+        @apply rounded-2xl;
+    }
+
+    /* ── Description: generous space, scrollable ── */
+    .player-description {
+        max-height: 22svh;
+        min-height: 8svh;
+        font-size: clamp(12px, 3.2vw, 15px);
+        padding: 3vw;
+        @apply rounded-xl leading-relaxed border border-white/10 bg-black/20;
+        display: block;
+        overflow-y: auto;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-box-orient: unset;
+    }
+
+    /* Comments – contained within parent */
+    .episode-comments {
+        padding: 3vw;
+        @apply rounded-xl;
+        flex: 0 0 auto;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .comments-head {
+        margin-bottom: 1.5svh;
+        padding-bottom: 1svh;
+        flex-shrink: 0;
+    }
+
+    .comment-form-top {
+        flex-shrink: 0;
+        margin-bottom: 2vw;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .comment-compose {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .comment-form-top .comment-input {
+        min-height: 5svh;
+        font-size: clamp(11px, 3vw, 14px);
+        padding: 1.5svh 3vw;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .comment-form-actions {
+        padding: 1svh 2.5vw;
+        flex-wrap: wrap;
+    }
+
+    .comment-auth-note {
+        font-size: clamp(9px, 2.4vw, 11px);
+    }
+
+    .comment-submit {
+        height: 4svh;
+        padding-left: 3vw;
+        padding-right: 3vw;
+        font-size: clamp(10px, 2.8vw, 12px);
+    }
+
+    .comment-item {
+        padding: 2vw;
+    }
+
+    .comment-body {
+        font-size: clamp(11px, 3vw, 14px);
+    }
+
+    .comment-author {
+        font-size: clamp(10px, 2.8vw, 13px);
+    }
+
+    .comment-time {
+        font-size: clamp(8px, 2.2vw, 11px);
+    }
+
+    .comments-list {
+        gap: 1svh;
+        flex: 0 0 auto;
+        min-height: 0;
+        max-height: 34svh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }

@@ -7,6 +7,7 @@ let episodes = [];
 let originalEpisodes = []; // Store original fetch for sorting
 let sortOrder = 'desc'; // 'desc' (newest first) or 'asc' (oldest first)
 let scrollContainer, stickyWrapper, horizontalTrack, timelineFillBottom, timelineFillTrack, cards, scrollHint;
+let mobileTrackMarkers = [];
 let maxScroll = 0;
 let windowHeight = window.innerHeight;
 let isScrolling = false;
@@ -29,7 +30,10 @@ const commentsById = new Map();
 
 let lastFocusedElement = null;
 
+const isMobileLayout = () => window.matchMedia('(max-width: 767px)').matches;
+
 const updateTrackProgressGeometry = () => {
+    if (isMobileLayout()) return;
     if (!horizontalTrack || !cards || !cards.length) return;
 
     const connector = horizontalTrack.querySelector('.episodes-track-progress');
@@ -42,6 +46,68 @@ const updateTrackProgressGeometry = () => {
 
     connector.style.left = `${start}px`;
     connector.style.width = `${Math.max(0, end - start)}px`;
+};
+
+const renderMobileTrackMarkers = () => {
+    if (!isMobileLayout()) {
+        mobileTrackMarkers = [];
+        return;
+    }
+    if (!horizontalTrack || !cards?.length) return;
+
+    const connector = horizontalTrack.querySelector('.episodes-track-progress');
+    if (!connector) return;
+
+    connector.querySelectorAll('.episodes-track-marker').forEach((marker) => marker.remove());
+    mobileTrackMarkers = [];
+
+    const connectorHeight = connector.offsetHeight;
+    const connectorTop = connector.offsetTop;
+    if (!Number.isFinite(connectorHeight) || connectorHeight <= 0) return;
+
+    cards.forEach((card, index) => {
+        const centerY = card.offsetTop + (card.offsetHeight / 2);
+        const relativeCenter = (centerY - connectorTop) / connectorHeight;
+        const clamped = Math.max(0, Math.min(1, relativeCenter));
+
+        const marker = document.createElement('span');
+        marker.className = 'episodes-track-marker';
+        marker.setAttribute('aria-hidden', 'true');
+        marker.dataset.index = String(index);
+        marker.style.top = `${clamped * 100}%`;
+
+        connector.appendChild(marker);
+        mobileTrackMarkers.push(marker);
+    });
+};
+
+const updateMobileTrackMarkerState = (progress = 0) => {
+    if (!isMobileLayout() || !cards?.length || !mobileTrackMarkers.length) return;
+
+    let activeIndex = 0;
+    let minDistance = Infinity;
+    const viewportAnchor = window.innerHeight * 0.45;
+
+    cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.top + (rect.height / 2);
+        const distance = Math.abs(cardCenter - viewportAnchor);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            activeIndex = index;
+        }
+    });
+
+    cards.forEach((card, index) => {
+        card.classList.toggle('active', index === activeIndex);
+    });
+
+    mobileTrackMarkers.forEach((marker, index) => {
+        const markerTopPercent = Number.parseFloat(marker.style.top || '0') / 100;
+        marker.classList.toggle('is-passed', markerTopPercent <= progress + 0.002 || index <= activeIndex);
+        marker.classList.toggle('is-active', index === activeIndex);
+    });
 };
 
 // Utils
@@ -258,7 +324,7 @@ const renderCards = () => {
                 <!-- Play Overlay -->
                      <div class="card-play-overlay">
                          <button class="card-play-btn" aria-label="Redă episodul ${displayNum}">
-                        <svg class="w-10 h-10 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-7 h-7 md:w-10 md:h-10 ml-0.5 md:ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                    </button>
                 </div>
             </div>
@@ -286,6 +352,7 @@ const renderCards = () => {
     cards = document.querySelectorAll('.episode-card');
     timelineFillTrack = document.getElementById('timeline-fill-track');
     updateTrackProgressGeometry();
+    renderMobileTrackMarkers();
 };
 
 const setupScroll = () => {
@@ -301,6 +368,7 @@ const setupScroll = () => {
         resizeRaf = requestAnimationFrame(() => {
             windowHeight = window.innerHeight;
             updateTrackProgressGeometry();
+            renderMobileTrackMarkers();
             updateScroll();
         });
     }, { passive: true });
@@ -336,6 +404,7 @@ const setupScroll = () => {
 const handleSnap = () => {
     clearTimeout(snapTimeout);
 
+    if (isMobileLayout()) return;
     if (!scrollContainer || !horizontalTrack || !cards?.length) return;
     
     // Only snap if we are distinctly within the scroll container bounds
@@ -434,6 +503,21 @@ const handleSnap = () => {
 };
 
 const updateScroll = () => {
+    if (isMobileLayout()) {
+        const track = document.getElementById('horizontal-track');
+        const fillTrack = document.getElementById('timeline-fill-track');
+        if (track && fillTrack) {
+            const trackRect = track.getBoundingClientRect();
+            const scrollable = trackRect.height - windowHeight;
+            const progress = scrollable > 0
+                ? Math.max(0, Math.min(1, -trackRect.top / scrollable))
+                : 0;
+            fillTrack.style.height = `${progress * 100}%`;
+            fillTrack.style.width = '';
+            updateMobileTrackMarkerState(progress);
+        }
+        return;
+    }
     if (!scrollContainer || !horizontalTrack) return;
 
     const rect = scrollContainer.getBoundingClientRect();
