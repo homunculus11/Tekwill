@@ -653,5 +653,60 @@
 @media (max-width: 640px) {
   .site-header {
     width: calc(100% - 10px);
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .header-drawer {
+    left: 5px;
+    right: 5px;
+  }
+
+  .footer-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 2.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .footer-top {
+    gap: 1.75rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .footer-brand {
+    align-items: center;
+  }
+
+  .footer-tagline {
+    text-align: center;
+  }
+
+  .footer-nav {
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .footer-nav-group {
+    align-items: center;
+  }
+
+  .footer-nav-list {
+    align-items: center;
+  }
+
+  .footer-social {
+    align-items: center;
+  }
+
+  .footer-bottom {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-divider {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 }

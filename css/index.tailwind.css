@@ -505,18 +505,82 @@ h4 {
     }
 
     .floating-card {
-      @apply relative bottom-0 left-0 mt-[-38px];
+      @apply relative bottom-0 left-0 mt-[-38px] w-full max-w-none;
+      transform: none;
     }
 
     .floating-badge {
       @apply relative right-0 top-0 mt-[-14px] self-end;
+      transform: none;
+    }
+
+    .hero-visual {
+      @apply mx-auto;
+      max-width: 340px;
     }
   }
 
   @media (max-width: 640px) {
     .hero,
     .section {
-      @apply px-[18px] py-14;
+      @apply px-4 py-10;
+    }
+
+    .hero-inner {
+      @apply grid-cols-1;
+      gap: 28px;
+    }
+
+    .hero-copy {
+      gap: 16px;
+    }
+
+    .hero-visual {
+      @apply mx-auto;
+      max-width: 260px;
+    }
+
+    .hero-ctas {
+      @apply flex-col;
+    }
+
+    .hero-ctas .btn {
+      @apply w-full justify-center text-center;
+    }
+
+    .quote-carousel {
+      min-height: 5.25rem;
+    }
+
+    .hero-metrics {
+      @apply grid-cols-3;
+      gap: 10px;
+    }
+
+    .metric-card {
+      @apply px-3 py-[10px];
+    }
+
+    .metric-value {
+      @apply text-xl;
+    }
+
+    .metric-label {
+      @apply text-[11px];
+    }
+
+    .metric-caption {
+      @apply text-xs leading-snug;
+    }
+
+    .floating-card {
+      @apply w-full max-w-none;
+      transform: none;
+    }
+
+    .floating-badge {
+      @apply self-center;
+      transform: none;
     }
 
     .section-header {
@@ -535,22 +599,50 @@ h4 {
       @apply grid-cols-1;
     }
 
-    .listen-grid,
-    .guests-grid {
+    .listen-grid {
       @apply grid-cols-1;
     }
 
-    .episode-card {
-      @apply min-h-[225px] p-[18px];
+    .guests-grid {
+      @apply grid-cols-1;
+      gap: 0.75rem;
     }
 
-    .guest-card,
-    .listen-card {
-      @apply min-h-[unset];
+    .episode-card {
+      @apply min-h-[200px] p-4;
+    }
+
+    .episode-card .play-btn {
+      @apply bottom-3 right-3;
+    }
+
+    .guest-card {
+      @apply min-h-[unset] flex-row;
     }
 
     .guest-media {
-      @apply h-[200px];
+      @apply h-auto w-[110px] shrink-0 border-b-0 border-r;
+      min-height: 130px;
+    }
+
+    .guest-content {
+      @apply px-4 py-3;
+    }
+
+    .guest-name {
+      @apply text-base;
+    }
+
+    .guest-episode {
+      @apply mt-1;
+    }
+
+    .guest-date {
+      @apply pt-2;
+    }
+
+    .listen-card {
+      @apply min-h-[unset];
     }
 
     .play-btn {
@@ -564,6 +656,14 @@ h4 {
     .final-cta-actions .btn,
     .final-cta-link {
       @apply w-full;
+    }
+
+    .preview-player {
+      @apply px-2 pb-2;
+    }
+
+    .preview-player-card {
+      @apply max-w-none;
     }
   }
 
@@ -893,17 +993,30 @@ main {
 }
 
 @media (max-width: 640px) {
+  .hero {
+    padding-top: 80px;
+    padding-bottom: 48px;
+  }
+
   .hero-title {
-    font-size: clamp(34px, 11vw, 48px);
+    font-size: clamp(32px, 10vw, 44px);
+    max-width: none;
+    line-height: 1;
   }
 
   .hero-description {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .section {
+    padding-top: 2.75rem;
+    padding-bottom: 2.75rem;
   }
 
   .section-title {
     padding-left: 15px;
-    font-size: clamp(24px, 8vw, 34px);
+    font-size: clamp(24px, 7vw, 32px);
   }
 
   .section-title::before {
@@ -912,6 +1025,109 @@ main {
 
   body::after {
     opacity: 0.24;
+  }
+
+  .hero-photo {
+    border-radius: 22px;
+    box-shadow: 0 16px 36px rgba(3, 8, 16, 0.38);
+  }
+
+  .photo-ring {
+    inset: 0.5rem;
+    border-radius: 16px;
+  }
+
+  .floating-card {
+    border-radius: 18px;
+  }
+
+  .floating-badge {
+    font-size: 12px;
+    padding: 7px 12px;
+  }
+
+  .metric-card {
+    border-radius: 16px;
+  }
+
+  .episode-card,
+  .listen-card {
+    border-radius: 18px;
+  }
+
+  .guest-card {
+    border-radius: 18px;
+  }
+
+  .guest-media {
+    border-top-left-radius: inherit;
+    border-bottom-left-radius: inherit;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .final-cta-card {
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  .quote-slide {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  .quote-slide blockquote {
+    font-size: 0.875rem;
+  }
+
+  .quote-slide figcaption {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: clamp(26px, 8.5vw, 34px);
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+
+  .metric-card {
+    padding: 8px 10px;
+  }
+
+  .metric-value {
+    font-size: 18px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .metric-caption {
+    display: none;
+  }
+
+  .floating-badge {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .guest-media {
+    width: 90px;
+    min-height: 110px;
+  }
+
+  .hero-visual {
+    max-width: 220px;
+  }
+
+  .hero-description {
+    font-size: 0.875rem;
   }
 }
 
