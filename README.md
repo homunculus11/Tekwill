@@ -27,7 +27,7 @@ npm run watch:css
 
 You can open files directly, but using a local static server (for example VS Code Live Server) is recommended during development.
 
-## Build CSS for production
+## Build CSS only
 
 ```bash
 npm run build:css
@@ -40,12 +40,25 @@ Examples:
 - `css/index.tailwind.css` → `css/index.css`
 - `css/prototype.tailwind.css` → `css/prototype.css`
 
+## Build production artifact (Pages-like)
+
+```bash
+npm run build
+```
+
+This command runs the same build flow used by Pages automation:
+
+1. Compiles Tailwind CSS with minification
+2. Creates a clean `dist/` folder
+3. Copies deployable files/folders (`assets`, `images`, `js`, `src`, `index.html`, `prototype.html` when present)
+4. Copies only compiled CSS files to `dist/css` (excludes `*.tailwind.css`)
+
 ## Deploy to GitHub Pages (auto build + publish)
 
 This repository includes a workflow at `.github/workflows/pages.yml` that:
 
 1. Installs dependencies
-2. Runs `npm run build` (Tailwind compile)
+2. Runs `npm run build` (full production artifact build)
 3. Publishes the built static site to GitHub Pages
 
 ### One-time setup in GitHub

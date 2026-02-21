@@ -30,31 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build CSS
+      - name: Build production artifact
         run: npm run build
-
-      - name: Prepare Pages artifact
-        run: |
-          mkdir -p dist
-          for item in assets images js src index.html prototype.html; do
-            if [ -e "$item" ]; then
-              cp -r "$item" dist/
-            else
-              echo "Skipping missing path: $item"
-            fi
-          done
-
-          mkdir -p dist/css
-          find css -maxdepth 1 -name '*.css' ! -name '*.tailwind.css' -exec cp {} dist/css/ \;
-
-          rm -rf dist/firebase-templates
-          if [ -d "dist/firebase-templates" ]; then
-            echo "firebase-templates must not be deployed" >&2
-            exit 1
-          fi
-
-          echo "Dist artifact contents:"
-          find dist -maxdepth 3 -type f | sort
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
